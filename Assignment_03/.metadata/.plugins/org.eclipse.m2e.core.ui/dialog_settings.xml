@@ -2,9 +2,10 @@
 <section name="Workbench">
 	<section name="MavenProjectWizardLocationPage">
 		<list key="location">
+			<item value="D:\Learn and Code\Assignment_03"/>
+			<item value="D:\Learn and Code\Assignment_03\TumblrPostFetcher\src\main"/>
 			<item value="D:\Learn and Code\Assignment_03\Comments\src\main\call.java"/>
 			<item value="D:\Learn and Code\Assignment_03\test"/>
-			<item value="D:\Learn and Code\Assignment_03"/>
 		</list>
 		<list key="projectNameTemplate">
 			<item value="[artifactId]"/>
@@ -47,6 +48,7 @@
 	</section>
 	<section name="MavenProjectWizardArtifactPage">
 		<list key="groupId">
+			<item value="TumblrInfoFetcher"/>
 			<item value="LandC"/>
 			<item value="73787"/>
 			<item value="687"/>
@@ -55,6 +57,7 @@
 			<item value="kdjkdj"/>
 		</list>
 		<list key="artifactId">
+			<item value="TumblrInfoFetcher"/>
 			<item value="LandC"/>
 			<item value="3783"/>
 			<item value="789"/>

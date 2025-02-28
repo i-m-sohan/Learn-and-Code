@@ -1,8 +1,0 @@
-
-public class MainService {
-	public static void main(String[] args) {
-		ImageFetcher imageFetcher = new ImageFetcher();
-		BlogData blogData = imageFetcher.fetchBlogData("good",1,5);
-		
-	}
-}

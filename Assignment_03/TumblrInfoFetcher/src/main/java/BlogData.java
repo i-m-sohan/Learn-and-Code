@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.Set;
 
 public class BlogData {
-	String title;
-    String name;
-    String description;
-    int totalPosts;
-    public Map<Integer,Set<String>> postNoWithImageUrls= new HashMap<>();
+	private String title;
+    private String name;
+    private String description;
+    private int totalPosts;
+    private Map<Integer,Set<String>> postNoWithImageUrls= new HashMap<>();
     
     public BlogData(String title, String name, String description, int totalPosts) {
     	this.title = title;

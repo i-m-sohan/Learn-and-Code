@@ -1,7 +1,0 @@
-package com.namingConvention.services;
-
-public class AdjacentCountries {
-	public String findAdjacentCountry(String countryCode) {
-		return "";
-	}
-}

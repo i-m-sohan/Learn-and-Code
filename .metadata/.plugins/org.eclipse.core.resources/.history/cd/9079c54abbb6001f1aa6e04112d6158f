@@ -1,0 +1,19 @@
+package com.namingConvention;
+
+import com.namingConvention.services.*;
+import com.namingConvention.input;
+import java.util.*;
+
+public class Main {
+	 public static void main(String[] args) {
+		 InputValue inputHelper = new InputValue();
+		 
+		 System.out.print("Give input");
+	        Scanner scanner = new Scanner(System.in);
+	        String a = scanner.next();
+	        System.out.println(a);
+	        String abajn = scanner.nextLine();
+	        int b = scanner.nextInt();
+	        System.out.print(b);
+	    }
+}

@@ -1,0 +1,14 @@
+package com.namingConvention;
+
+import com.namingConvention.services.*;
+import java.util.*;
+
+public class Main {
+	 public static void main(String[] args) {
+	        Scanner scanner = new Scanner(System.in);
+	        String a = scanner.next();
+	        System.out.println(a);
+	        int b = scanner.nextInt();
+	        System.out.print(b);
+	    }
+}

@@ -1,0 +1,5 @@
+package com.namingConvention.services;
+
+public class AdjacentCountries {
+
+}

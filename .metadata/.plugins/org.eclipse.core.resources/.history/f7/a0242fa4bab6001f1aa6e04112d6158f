@@ -1,0 +1,5 @@
+package com.namingConvention.input;
+
+public class InputValue {
+
+}

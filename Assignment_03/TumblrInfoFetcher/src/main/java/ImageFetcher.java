@@ -11,7 +11,6 @@ public class ImageFetcher {
     private final int CONNECT_TIMEOUT = 5000;
     private final int READ_TIMEOUT = 5000;
     private final String URL_TEMPLATE = "https://%s.tumblr.com/api/read/json?type=photo&num=%d&start=%d";
-    
     public BlogData fetchBlogData(String blogName,int startPost,int endPost) throws IOException {
         String apiUrl = prepareApiUrl(blogName,startPost,endPost);
         String jsonResponse = ApiUtils.fetchApiResponse(apiUrl, CONNECT_TIMEOUT, READ_TIMEOUT);

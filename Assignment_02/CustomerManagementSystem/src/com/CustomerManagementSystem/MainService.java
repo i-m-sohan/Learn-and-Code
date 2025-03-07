@@ -9,9 +9,9 @@ import com.CustomerManagementSystem.CustomerDataTransformer.CustomerDataTransfor
 import com.CustomerManagementSystem.Input.InputValue;
 
 public class MainService{
-	public static void main(String[] args){	
-		CustomerSelector customerSelector = new CustomerSelector();
-		List<Customer> customers  = customerSelector.getCustomersByCountry("america");
+	public static void main(String[] args)throws SQLException , ClassNotFoundException{	
+		CustomerSelector selector = new CustomerSelector();
+		List<Customer> customers  = selector.getCustomersByCountry("INDIA");
 		CustomerDataTransformer customerDataTransformer = new CustomerDataTransformer();
 		String customerCsvData = customerDataTransformer.exportToCSV(customers);
 		System.out.println(customerCsvData);

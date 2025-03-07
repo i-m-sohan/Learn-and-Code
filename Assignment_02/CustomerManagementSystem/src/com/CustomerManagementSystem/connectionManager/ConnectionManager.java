@@ -9,12 +9,11 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class ConnectionManager {
-	private static String DATABASE_FILE_PATH = "src/database.properties";
 	private static Connection connection = null;
 	public static Connection getConnection(){
 		try {
 			Properties properties = new Properties();
-			FileInputStream propertyFile = new FileInputStream(DATABASE_FILE_PATH);
+			FileInputStream propertyFile = new FileInputStream("src/database.properties");
 			properties.load(propertyFile);
 			connection = DriverManager.getConnection(properties.getProperty("url"),properties.getProperty("username"),properties.getProperty("password"));
 		}

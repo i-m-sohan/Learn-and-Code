@@ -3,8 +3,12 @@ package com.BankApp;
 import com.BankApp.controller.MainController;
 import com.BankApp.dao.AccountDAO;
 import com.BankApp.dao.UserDAO;
+import com.BankApp.daoImp.AccountDaoImp;
+import com.BankApp.daoImp.UserDaoImp;
 import com.BankApp.model.Account;
 import com.BankApp.model.User;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class BankApp {
 
@@ -12,10 +16,10 @@ public class BankApp {
         User dummyUser = new User("Sohan Kumar", "sohan@example.com", "sohan", "root");
         Account dummyAccount = new Account("sohan", "ACC123456", 5000, 10, 200,1234);
 
-        UserDAO userDAO = new UserDAO();
+        UserDAO userDAO = new UserDaoImp();
         userDAO.insertUser(dummyUser);
 
-        AccountDAO accountDAO = new AccountDAO();
+        AccountDAO accountDAO = new AccountDaoImp();
         accountDAO.insertAccount(dummyAccount);
     }
 

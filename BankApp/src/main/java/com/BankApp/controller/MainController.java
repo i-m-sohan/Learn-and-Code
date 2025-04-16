@@ -24,7 +24,13 @@ public class MainController {
 
             switch (choice) {
                 case 1:
-                    authController.register();
+                    try {
+                        authController.register();
+                        authController.login();
+                    }
+                    catch(Exception excep){
+                        System.out.println("User not Registered! Try again....");
+                    }
                     break;
                 case 2:
                     authController.login();

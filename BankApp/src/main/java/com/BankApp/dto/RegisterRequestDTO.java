@@ -1,17 +1,17 @@
 package com.BankApp.dto;
 
 
-public class RegisterRequest {
+public class RegisterRequestDTO {
     private String username;
     private String password;
     private String fullName;
     private String email;
     private String accountType;
     private int pin;
-    public RegisterRequest(){
+    public RegisterRequestDTO(){
 
     }
-    public RegisterRequest(String username, String password, String fullName, String email, String accountType,int pin) {
+    public RegisterRequestDTO(String username, String password, String fullName, String email, String accountType, int pin) {
         this.username = username;
         this.password = password;
         this.fullName = fullName;

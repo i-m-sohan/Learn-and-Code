@@ -49,7 +49,7 @@ public class InputHelper {
         System.out.println(msg);
         try {
             double value = inputs.nextDouble();
-            inputs.nextLine();  // Consume newline
+            inputs.nextLine();
             return value;
         } catch (InputMismatchException e) {
             inputs.nextLine();

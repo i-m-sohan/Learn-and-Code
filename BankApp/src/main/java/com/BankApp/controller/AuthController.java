@@ -1,24 +1,27 @@
 package com.BankApp.controller;
 
-import com.BankApp.dto.LoginRequest;
-import com.BankApp.dto.RegisterRequest;
+import com.BankApp.dto.LoginRequestDTO;
+import com.BankApp.dto.RegisterRequestDTO;
 import com.BankApp.exception.LoginException;
 import com.BankApp.helper.InputHelper;
 import com.BankApp.service.AuthService;
+import com.BankApp.service.RegisterationService;
 
 public class AuthController {
 
     AccountController accountController;
     AuthService authService;
     InputHelper inputHelper;
+    RegisterationService registerationService;
 
     public AuthController(){
         accountController  = new AccountController();
         inputHelper = new InputHelper();
         authService = new AuthService();
+        registerationService = new RegisterationService();
     }
 
-    public void register() {
+    public void register() throws Exception{
         System.out.println("\n--- User Registration ---");
 
         System.out.println("Select Account Type: ");
@@ -33,11 +36,7 @@ public class AuthController {
         String email = inputHelper.inputLine("Enter Email: ");
         int pin = inputHelper.inputInt("Enter Pin: ");
 
-        System.out.println("Printingh detials:");
-        System.out.println("uysername "+username);
-        System.out.println("password "+ password);
-        RegisterRequest registerRequest = new RegisterRequest();
-
+        RegisterRequestDTO registerRequest = new RegisterRequestDTO();
         registerRequest.setUsername(username);
         registerRequest.setPassword(password);
         registerRequest.setEmail(email);
@@ -45,9 +44,7 @@ public class AuthController {
         registerRequest.setAccountType(accountType);
         registerRequest.setPin(pin);
 
-        authService.register(registerRequest);
-
-        login();
+        registerationService.register(registerRequest);
     }
 
     public void login(){
@@ -55,7 +52,7 @@ public class AuthController {
         String username = inputHelper.inputLine("Enter your username: ");
         String password = inputHelper.inputLine("Enter your password: ");
 
-        LoginRequest loginRequest = new LoginRequest();
+        LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setUsername(username);
         loginRequest.setPassword(password);
 

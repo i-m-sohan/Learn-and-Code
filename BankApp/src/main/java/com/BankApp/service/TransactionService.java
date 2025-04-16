@@ -3,6 +3,9 @@ package com.BankApp.service;
 import com.BankApp.dao.AccountDAO;
 import com.BankApp.dao.TransactionDAO;
 import com.BankApp.dao.UserDAO;
+import com.BankApp.daoImp.AccountDaoImp;
+import com.BankApp.daoImp.TransactionDaoImp;
+import com.BankApp.daoImp.UserDaoImp;
 import com.BankApp.dto.MoneyTransferDTO;
 import com.BankApp.model.Account;
 import com.BankApp.model.Transaction;
@@ -15,9 +18,9 @@ public class TransactionService {
     TransactionDAO transactionDAO;
 
     public TransactionService() {
-        this.userDAO = new UserDAO();
-        this.accountDAO = new AccountDAO();
-        this.transactionDAO = new TransactionDAO();
+        this.userDAO = new UserDaoImp();
+        this.accountDAO = new AccountDaoImp();
+        this.transactionDAO = new TransactionDaoImp();
     }
 
     public TransactionService(UserDAO userDAO, AccountDAO accountDAO, TransactionDAO transactionDAO) {
@@ -52,6 +55,7 @@ public class TransactionService {
                 System.out.println("From : "+  transaction.getFromAccount());
                 System.out.println("To : " + transaction.getToAccount());
                 System.out.println("Amount : " + transaction.getAmount());
+                System.out.println("Time : "+transaction.getTimestamp());
             }
         }else{
             System.out.println("There is no transaction to show!");

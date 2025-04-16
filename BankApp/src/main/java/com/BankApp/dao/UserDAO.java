@@ -7,14 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserDAO {
-    private static Map<String,User> users = new HashMap<>();
+public interface UserDAO {
 
-    public void insertUser(User user) {
-        users.put(user.getUsername(),user);
-    }
+    public void insertUser(User user);
 
-    public User getUserByUsername(String username){
-        return users.get(username);
-    }
+    public User getUserByUsername(String username);
 }

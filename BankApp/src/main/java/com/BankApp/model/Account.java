@@ -66,9 +66,11 @@ public class Account {
     public int getPin(){
         return this.pin;
     }
+
     public void setPin(int pin){
         this.pin = pin;
     }
+
     public void withdraw(int amount) {
         if (isWithdrawAmountValid(amount)) {
             this.balance -= amount;

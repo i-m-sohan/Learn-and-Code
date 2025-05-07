@@ -29,11 +29,17 @@ public class MainController {
                         authController.login();
                     }
                     catch(Exception excep){
-                        System.out.println("User not Registered! Try again....");
+                        System.out.println(excep.getMessage());
                     }
                     break;
                 case 2:
-                    authController.login();
+                    try {
+                        authController.login();
+                    }
+                    catch(Exception excep){
+                        System.out.println(excep.getMessage());
+                    }
+
                     break;
                 case 3:
                     System.out.println("Thank you for using the banking system. Goodbye!");

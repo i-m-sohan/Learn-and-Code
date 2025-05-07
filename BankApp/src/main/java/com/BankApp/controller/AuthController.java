@@ -47,7 +47,7 @@ public class AuthController {
         registerationService.register(registerRequest);
     }
 
-    public void login(){
+    public void login() throws Exception{
         System.out.println("\n--- User Login ---");
         String username = inputHelper.inputLine("Enter your username: ");
         String password = inputHelper.inputLine("Enter your password: ");
@@ -55,13 +55,8 @@ public class AuthController {
         LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setUsername(username);
         loginRequest.setPassword(password);
+        authService.login(loginRequest);
+        accountController.accountMainMenu(username);
 
-        try {
-            authService.login(loginRequest);
-            accountController.accountMainMenu(username);
-        }
-        catch(LoginException excep){
-            System.out.println(excep.getMessage());
-        }
     }
 }

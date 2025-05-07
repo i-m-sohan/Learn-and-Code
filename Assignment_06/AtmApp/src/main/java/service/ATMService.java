@@ -19,7 +19,6 @@ public class ATMService {
         if (amount > atmCash) {
             throw new ATMOutOfCashException("ATM does not have enough cash.");
         }
-
         account.withdraw(amount);
         atmCash -= amount;
     }

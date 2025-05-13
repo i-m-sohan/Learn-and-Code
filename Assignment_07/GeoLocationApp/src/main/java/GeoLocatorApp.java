@@ -21,5 +21,6 @@ public class GeoLocatorApp {
         catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }
+
     }
 }

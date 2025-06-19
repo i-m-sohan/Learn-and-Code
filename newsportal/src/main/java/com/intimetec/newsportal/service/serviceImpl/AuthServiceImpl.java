@@ -4,17 +4,15 @@ import com.intimetec.newsportal.dto.LoginRequestDTO;
 import com.intimetec.newsportal.dto.SignUpRequestDTO;
 import com.intimetec.newsportal.exception.UserAlreadyExistException;
 import com.intimetec.newsportal.exception.UserNotFoundException;
+import com.intimetec.newsportal.mapper.UserMapper;
+import com.intimetec.newsportal.model.Role;
 import com.intimetec.newsportal.model.User;
 import com.intimetec.newsportal.repository.UserRepository;
 import com.intimetec.newsportal.service.AuthService;
-import org.aspectj.lang.annotation.RequiredTypes;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -30,25 +28,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void registerUser(SignUpRequestDTO signUpRequestDTO){
-        Optional<User> oldUser = userRepository.findByUsername(signUpRequestDTO.getUsername());
-        if(oldUser.isPresent()){
-            throw new UserAlreadyExistException("User with username : "+ oldUser.get().getUsername() +" and Email : " + oldUser.get().getEmail() + " already exist");
-        }
 
+        validateSignUpRequest(signUpRequestDTO);
         String hashedPassword = passwordEncoder.encode(signUpRequestDTO.getPassword());
+        signUpRequestDTO.setPassword(hashedPassword);
 
-        User user = new User();
-        user.setUsername(signUpRequestDTO.getUsername());
-        user.setEmail(signUpRequestDTO.getEmail());
-        user.setRole(signUpRequestDTO.getRole());
-        user.setPassword(hashedPassword);
-
+        User user = UserMapper.toEntity(signUpRequestDTO);
         userRepository.save(user);
     }
 
     @Override
     public void loginUser(LoginRequestDTO loginRequestDTO){
-
         Optional<User> oldUser = userRepository.findByUsername(loginRequestDTO.getUsername());
 
         if(!oldUser.isPresent()){
@@ -59,4 +49,17 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Invalid Credential!");
         }
     }
+
+    private void validateSignUpRequest(SignUpRequestDTO signUpRequestDTO){
+        Optional<User> oldUser = userRepository.findByUsername(signUpRequestDTO.getUsername());
+        if(oldUser.isPresent()){
+            throw new UserAlreadyExistException("User with username : "+ oldUser.get().getUsername() +" and Email : " + oldUser.get().getEmail() + " already exist");
+        }
+        try {
+            Role role = Role.valueOf(signUpRequestDTO.getRole().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid role: " + signUpRequestDTO.getRole());
+        }
+    }
+
 }

@@ -12,8 +12,9 @@ import java.util.List;
 public class NewsAggregationPortalApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NewsAggregationPortalApplication.class, args);
-//		ArticleSyncScheduler articleSyncScheduler = context.getBean(ArticleSyncScheduler.class);
+		var context = SpringApplication.run(NewsAggregationPortalApplication.class, args);
+		ArticleSyncScheduler articleSyncScheduler = context.getBean(ArticleSyncScheduler.class);
+		articleSyncScheduler.fetchArticle();
 //		List<ArticleDTO> articleDTOList = articleSyncScheduler.fetchLatestArticles();
 //		String emailBody = "";
 //		for(ArticleDTO articleDTO : articleDTOList){

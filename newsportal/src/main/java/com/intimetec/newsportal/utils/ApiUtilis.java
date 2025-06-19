@@ -1,0 +1,52 @@
+package com.intimetec.newsportal.utils;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ApiUtilis {
+
+    public static HttpResponse<String> get(String baseUrl, Map<String, String> queryParams)
+            throws IOException, InterruptedException{
+        Map<String, String> header = new HashMap<>();
+
+        return get(baseUrl,queryParams,header);
+    }
+
+    public static HttpResponse<String> get(String baseUrl, Map<String, String> queryParams, Map<String, String> header)
+            throws IOException, InterruptedException {
+        String urlWithParams = buildUrl(baseUrl, queryParams);
+
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .uri(URI.create(urlWithParams))
+                .GET();
+
+        if (header != null && !header.isEmpty()) {
+            header.forEach(requestBuilder::header);
+        }
+        HttpRequest request = requestBuilder.build();
+        HttpClient client = HttpClient.newHttpClient();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static String buildUrl(String baseUrl, Map<String, String> queryParams) {
+        StringBuilder urlBuilder = new StringBuilder(baseUrl);
+        if (queryParams != null && !queryParams.isEmpty()) {
+            urlBuilder.append("?");
+            queryParams.forEach((key, value) ->
+                    urlBuilder.append(URLEncoder.encode(key, StandardCharsets.UTF_8))
+                            .append("=")
+                            .append(URLEncoder.encode(value, StandardCharsets.UTF_8))
+                            .append("&")
+            );
+            urlBuilder.deleteCharAt(urlBuilder.length() - 1); // remove last '&'
+        }
+        return urlBuilder.toString();
+    }
+}

@@ -9,6 +9,7 @@ import com.intimetec.newsportal.dto.TheNewsApiArticleDTO;
 import com.intimetec.newsportal.dto.TheNewsApiResponseDTO;
 import com.intimetec.newsportal.utils.ApiUtilis;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.net.http.HttpResponse;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Component("theNewsApiClient")
 public class TheNewsApiClientImpl implements NewsClient {
 
     public String baseUrl;

@@ -2,6 +2,7 @@ package com.intimetec.newsportal.mapper;
 
 import com.intimetec.newsportal.dto.ArticleDTO;
 import com.intimetec.newsportal.model.Article;
+import com.intimetec.newsportal.model.Category;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class ArticleMapper {
 
-    public static ArticleDTO toDTO(Article article, List<String> categories) {
+    public static ArticleDTO toDTO(Article article) {
         if (article == null) return null;
 
         ArticleDTO dto = new ArticleDTO();
@@ -20,8 +21,13 @@ public class ArticleMapper {
         dto.setSource(article.getSource());
         dto.setUrl(article.getUrl());
         dto.setPublishedDate(article.getPublishedDate());
-        dto.setCategories(categories != null ? categories : Collections.emptyList());
 
+
+        List<String> categoryNamesList = new ArrayList<>();
+        for(Category category : article.getCategories()){
+            categoryNamesList.add(category.getCategoryName());
+        }
+        dto.setCategories(categoryNamesList);
         return dto;
     }
 

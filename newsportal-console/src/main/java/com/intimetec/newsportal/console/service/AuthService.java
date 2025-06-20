@@ -21,10 +21,9 @@ public class AuthService {
             );
 
             HttpResponse<String> response = ApiUtilis.post(BASE_URL + "/login", body);
-//            System.out.println(response.toString());
             System.out.println("Login response: " + response.body());
         } catch (Exception e) {
-            System.out.println("❌ Login failed: " + e.getMessage());
+            System.out.println("Login failed: " + e.getMessage());
         }
     }
 

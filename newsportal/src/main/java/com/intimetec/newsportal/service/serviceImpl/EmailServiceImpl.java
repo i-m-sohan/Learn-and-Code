@@ -13,11 +13,11 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender mailSender;
 
     @Override
-    public void sendEmail(String emailBody) {
+    public void sendEmail(String to, String emailSubject, String emailBody) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("your.email@gmail.com"); // Must match configured email
-        message.setTo("sohanj678@gmail.com");
-        message.setSubject("Test Gmail Service");
+        message.setFrom("jsohan678@gmail.com"); // Must match configured email
+        message.setTo(to);
+        message.setSubject(emailSubject);
         message.setText(emailBody);
 
         mailSender.send(message);

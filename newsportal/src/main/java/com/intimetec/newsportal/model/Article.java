@@ -58,7 +58,6 @@ public class Article {
         this.dislikesCount = dislikesCount;
     }
 
-    // Getters and Setters (include for categories)
     public Integer getArticleId() { return articleId; }
     public void setArticleId(Integer articleId) { this.articleId = articleId; }
 
@@ -94,6 +93,13 @@ public class Article {
         return "Article{" +
                 "articleId=" + articleId +
                 ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", content='" + content + '\'' +
+                ", source='" + source + '\'' +
+                ", url='" + url + '\'' +
+                ", publishedDate=" + publishedDate +
+                ", likesCount=" + likesCount +
+                ", dislikesCount=" + dislikesCount +
                 ", categories=" + categories +
                 '}';
     }

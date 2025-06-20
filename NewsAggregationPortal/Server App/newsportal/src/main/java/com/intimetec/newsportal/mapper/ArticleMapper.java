@@ -56,4 +56,13 @@ public class ArticleMapper {
 
         return articleList;
     }
+    public static List<ArticleDTO> toDTOList(List<Article> articleList) {
+        if (articleList == null) return List.of();
+
+        List<ArticleDTO> articleDTOListList = new ArrayList<>();
+        for(Article article : articleList){
+            articleDTOListList.add(toDTO(article));
+        }
+        return articleDTOListList;
+    }
 }

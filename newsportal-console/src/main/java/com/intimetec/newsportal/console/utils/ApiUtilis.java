@@ -51,6 +51,21 @@ public class ApiUtilis {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    public static HttpResponse<String> patch(String url, Map<String, String> jsonBody)
+            throws IOException, InterruptedException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(jsonBody);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
     public static String buildUrl(String baseUrl, Map<String, String> queryParams) {
         StringBuilder urlBuilder = new StringBuilder(baseUrl);
         if (queryParams != null && !queryParams.isEmpty()) {

@@ -13,8 +13,8 @@ public class NewsAggregationPortalApplication {
 
 	public static void main(String[] args) {
 		var context = SpringApplication.run(NewsAggregationPortalApplication.class, args);
-		ArticleSyncScheduler articleSyncScheduler = context.getBean(ArticleSyncScheduler.class);
-		articleSyncScheduler.fetchArticle();
+//		ArticleSyncScheduler articleSyncScheduler = context.getBean(ArticleSyncScheduler.class);
+//		articleSyncScheduler.fetchArticle();
 //		List<ArticleDTO> articleDTOList = articleSyncScheduler.fetchLatestArticles();
 //		String emailBody = "";
 //		for(ArticleDTO articleDTO : articleDTOList){

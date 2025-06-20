@@ -1,6 +1,7 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
 import com.intimetec.newsportal.dto.ArticleDTO;
+import com.intimetec.newsportal.dto.HeadlineRequestDTO;
 import com.intimetec.newsportal.mapper.ArticleMapper;
 import com.intimetec.newsportal.model.Article;
 import com.intimetec.newsportal.model.Category;
@@ -15,11 +16,38 @@ import java.util.*;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
+
+
     @Autowired
     private ArticleRepository articleRepository;
 
     @Autowired
     private CategoryService categoryService;
+
+    @Override
+    public List<ArticleDTO> getHeadlineArticles(HeadlineRequestDTO headlineRequestDTO){
+        List<Article> articleList =  articleRepository.findByPublishedDateBetween(headlineRequestDTO.getStartDate(),headlineRequestDTO.getEndDate());
+
+        List<Article> finalisedArticleList = new ArrayList<>();
+        String categoryName = headlineRequestDTO.getCategory();
+
+        if(!"All".equalsIgnoreCase(categoryName)){
+            if(articleList!=null){
+                for(Article article : articleList){
+                    Set<Category> categorySet = article.getCategories();
+                    for(Category category : categorySet){
+                        if(category.getCategoryName().equalsIgnoreCase(categoryName)){
+                            break;
+                        }
+                    }
+                    finalisedArticleList.add(article);
+                }
+            }
+        }
+        List<ArticleDTO> articleDTOList = ArticleMapper.toDTOList(finalisedArticleList);
+        return articleDTOList;
+
+    }
 
     @Override
     public List<Article> saveArticles(List<ArticleDTO> articleDTOList){

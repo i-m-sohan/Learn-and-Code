@@ -1,5 +1,7 @@
 package com.intimetec.newsportal.console.app;
 
+import com.intimetec.newsportal.console.dto.LoginRequestDTO;
+import com.intimetec.newsportal.console.dto.LoginResponseDTO;
 import com.intimetec.newsportal.console.input.AuthInputHandler;
 import com.intimetec.newsportal.console.service.AuthService;
 import com.sun.tools.javac.Main;
@@ -34,7 +36,16 @@ public class MainMenuHandler {
 
             String choice = scanner.nextLine();
             switch (choice) {
-                case "1" -> authService.login(authInputHandler.readLoginInput());
+                case "1" -> {
+                    LoginRequestDTO loginInput = authInputHandler.readLoginInput();
+                    LoginResponseDTO response = authService.login(loginInput);
+                    if("ADMIN".equalsIgnoreCase(response.getRole())){
+                        AdminMenuHandler.start();
+                    }
+                    else{
+                        UserMenuHandler.start();
+                    }
+                }
                 case "2" -> authService.signup(authInputHandler.readSignupInput());
                 case "3" -> {
                     System.out.println("Exiting application. Goodbye!");

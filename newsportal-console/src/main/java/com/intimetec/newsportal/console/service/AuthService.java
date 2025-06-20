@@ -1,6 +1,8 @@
 package com.intimetec.newsportal.console.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intimetec.newsportal.console.dto.LoginRequestDTO;
+import com.intimetec.newsportal.console.dto.LoginResponseDTO;
 import com.intimetec.newsportal.console.dto.SignUpRequestDTO;
 import com.intimetec.newsportal.console.utils.ApiUtilis;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,7 @@ public class AuthService {
 
     private static final String BASE_URL = "http://localhost:8080/newsportal.intimetec.com/v1";
 
-    public void login(LoginRequestDTO loginDto) {
+    public LoginResponseDTO login(LoginRequestDTO loginDto) {
         try {
             Map<String, String> body = Map.of(
                     "username", loginDto.getUsername(),
@@ -21,9 +23,13 @@ public class AuthService {
             );
 
             HttpResponse<String> response = ApiUtilis.post(BASE_URL + "/login", body);
-            System.out.println("Login response: " + response.body());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(response.body(), LoginResponseDTO.class);
+
         } catch (Exception e) {
             System.out.println("Login failed: " + e.getMessage());
+            return null;
         }
     }
 
@@ -37,9 +43,9 @@ public class AuthService {
             );
 
             HttpResponse<String> response = ApiUtilis.post(BASE_URL + "/signup", body);
-            System.out.println("✅ Signup response: " + response.body());
+            System.out.println("Signup response: " + response.body());
         } catch (Exception e) {
-            System.out.println("❌ Signup failed: " + e.getMessage());
+            System.out.println("Signup failed: " + e.getMessage());
         }
     }
 }

@@ -54,4 +54,16 @@ public class ExternalNewsSourceServiceImpl implements ExternalNewsSourceService 
         externalNewsSource.setApiKey(externalServerUpdateDTO.getApiKey());
         externalNewsSourceRepository.save(externalNewsSource);
     }
+
+    @Override
+    public List<ExternalNewsSourceDTO> findAllByOrderByLastAccessedAsc(){
+        List<ExternalNewsSource> externalNewsSourceList = externalNewsSourceRepository.findAllByOrderByLastAccessedAsc();
+        return ExternalNewsSourceMapper.toExternalNewsSourceDTOList(externalNewsSourceList);
+    }
+
+    @Override
+    public void updateNewsSourceLastAccessed(ExternalNewsSourceDTO externalNewsSourceDTO){
+        ExternalNewsSource externalNewsSource = externalNewsSourceMapper.toEntity(externalNewsSourceDTO);
+        externalNewsSourceRepository.save(externalNewsSource);
+    }
 }

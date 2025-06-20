@@ -2,7 +2,9 @@ package com.intimetec.newsportal.controller;
 
 import com.intimetec.newsportal.dto.LoginRequestDTO;
 import com.intimetec.newsportal.dto.SignUpRequestDTO;
+import com.intimetec.newsportal.model.User;
 import com.intimetec.newsportal.service.AuthService;
+import com.intimetec.newsportal.service.UserService;
 import org.aspectj.lang.annotation.DeclareError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,9 @@ public class AuthController {
     @Autowired
     AuthService authService;
 
+    @Autowired
+    UserService userService;
+
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignUpRequestDTO signUpRequestDTO){
         authService.registerUser(signUpRequestDTO);
@@ -31,7 +36,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO){
         authService.loginUser(loginRequestDTO);
-        return ResponseEntity.ok(Map.of("message", "Login successful"));
+
+        User user = userService.getUserByUsername(loginRequestDTO.getUsername());
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message", "Login successful",
+                        "role", user.getRole()
+                )
+        );
     }
 
 }

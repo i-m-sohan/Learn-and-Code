@@ -1,6 +1,7 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
 import com.intimetec.newsportal.dto.CategoryNotificationPreferenceDTO;
+import com.intimetec.newsportal.dto.NotificationDTO;
 import com.intimetec.newsportal.model.*;
 import com.intimetec.newsportal.repository.CategoryRepository;
 import com.intimetec.newsportal.repository.NotificationRepository;
@@ -41,7 +42,6 @@ public class NotificationServiceImpl implements NotificationService {
         userCategoryPreference.setCategory(category);
         userCategoryPreferenceRepository.save(userCategoryPreference);
     }
-
 
     @Transactional
     @Override
@@ -143,5 +143,10 @@ public class NotificationServiceImpl implements NotificationService {
             userToArticlesMap.put(user, articleSet);
         }
         return userToArticlesMap;
+    }
+
+    @Override
+    public List<NotificationDTO> getUserNotifications(Long userId) {
+        return List.of();
     }
 }

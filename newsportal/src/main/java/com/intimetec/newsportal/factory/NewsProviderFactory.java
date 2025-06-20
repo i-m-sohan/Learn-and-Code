@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,14 +43,21 @@ public class NewsProviderFactory {
 
 
     public NewsClient getBestNewsApiClient(){
-        List<ExternalNewsSourceDTO> externalNewsSourceDTOList =  externalNewsSourceService.getAllExternalNewsSources();
-        System.out.println("Printing dto while getting best client");
-        System.out.println(externalNewsSourceDTOList.get(1).toString());
-        System.out.println("Beseurl =");
-        System.out.println(externalNewsSourceDTOList.get(1).getBaseUrl());
-        NewsClient newsClient = getClientBySource(externalNewsSourceDTOList.get(1).getSourceName());
-        newsClient.setBaseUrl(externalNewsSourceDTOList.get(1).getBaseUrl());
-        newsClient.setApiKey(externalNewsSourceDTOList.get(1).getApiKey());
+        List<ExternalNewsSourceDTO> externalNewsSourceDTOList =  externalNewsSourceService.findAllByOrderByLastAccessedAsc();
+
+        ExternalNewsSourceDTO validSource = new ExternalNewsSourceDTO();
+
+        for(ExternalNewsSourceDTO externalNewsSourceDTO : externalNewsSourceDTOList){
+            if(externalNewsSourceDTO.getStatus()){
+                validSource = externalNewsSourceDTO;
+            }
+        }
+        validSource.setLastAccessed(LocalDateTime.now());
+        externalNewsSourceService.updateNewsSourceLastAccessed(validSource);
+
+        NewsClient newsClient = getClientBySource(validSource.getSourceName());
+        newsClient.setBaseUrl(validSource.getBaseUrl());
+        newsClient.setApiKey(validSource.getApiKey());
         return newsClient;
     }
 }

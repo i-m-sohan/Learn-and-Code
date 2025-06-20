@@ -26,6 +26,19 @@ public class ExternalNewsSourceMapper {
 
         return dto;
     }
+    public static List<ExternalNewsSourceDTO> toExternalNewsSourceDTOList(List<ExternalNewsSource> externalNewsSourceList){
+        if(externalNewsSourceList==null){
+            return null;
+        }
+        List<ExternalNewsSourceDTO> externalNewsSourceDTOList = new ArrayList<>();
+
+        for(ExternalNewsSource externalNewsSource :externalNewsSourceList ){
+            externalNewsSourceDTOList.add(toExternalNewsSourceDTO(externalNewsSource));
+        }
+
+        return externalNewsSourceDTOList;
+    }
+
     public static ExternalServerStatusDTO toStatusDTO(ExternalNewsSource entity) {
         if (entity == null) return null;
 

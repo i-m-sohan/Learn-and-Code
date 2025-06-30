@@ -20,6 +20,6 @@ public class NotificationController {
 
     @GetMapping("/notification/{userId}")
     public ResponseEntity<?> getUserNotifications(@PathVariable Long userId){
-
+        return null;
     }
 }

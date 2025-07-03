@@ -6,6 +6,9 @@ import com.intimetec.newsportal.model.Notification;
 import com.intimetec.newsportal.model.User;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class NotificationMapper {
 
@@ -30,5 +33,16 @@ public class NotificationMapper {
         notification.setMessage(dto.getMessage());
         notification.setCreatedAt(dto.getCreatedAt());
         return notification;
+    }
+
+    public static List<NotificationDTO> toDTOList(List<Notification> notificationList){
+
+        List<NotificationDTO> notificationDTOList = new ArrayList<>();
+        for(Notification notification : notificationList){
+            NotificationDTO notificationDTO =  toDTO(notification);
+            notificationDTOList.add(notificationDTO);
+        }
+
+        return notificationDTOList;
     }
 }

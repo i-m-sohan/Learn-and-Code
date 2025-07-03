@@ -1,11 +1,7 @@
 package com.intimetec.newsportal.console;
 
-import com.intimetec.newsportal.console.app.MainMenuHandler;
-import org.springframework.boot.SpringApplication;
+import com.intimetec.newsportal.console.app.menu.MainMenuHandler;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.awt.*;
-import java.util.List;
 
 @SpringBootApplication
 public class NewsportalConsoleApplication {

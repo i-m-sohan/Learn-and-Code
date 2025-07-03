@@ -15,9 +15,6 @@ import java.util.*;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
-
-
-
     @Autowired
     private ArticleRepository articleRepository;
 
@@ -44,9 +41,9 @@ public class ArticleServiceImpl implements ArticleService {
                 }
             }
         }
+
         List<ArticleDTO> articleDTOList = ArticleMapper.toDTOList(finalisedArticleList);
         return articleDTOList;
-
     }
 
     @Override
@@ -58,6 +55,13 @@ public class ArticleServiceImpl implements ArticleService {
         List<Article> savedArticlesList =  articleRepository.saveAll(articleList);
 
         return savedArticlesList;
+    }
+
+    @Override
+    public List<ArticleDTO> searchArticles(String keyword) {
+        List<Article> articles = articleRepository.searchByKeyword(keyword);
+        List<ArticleDTO> articleDTOList = ArticleMapper.toDTOList(articles);
+        return articleDTOList;
     }
 
     private Set<String> extractAllCategoryNames(List<ArticleDTO> articleDTOList){

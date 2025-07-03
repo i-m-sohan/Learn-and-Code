@@ -1,7 +1,9 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
+import com.intimetec.newsportal.dto.CategoryKeywordDTO;
 import com.intimetec.newsportal.dto.CategoryNotificationPreferenceDTO;
 import com.intimetec.newsportal.dto.NotificationDTO;
+import com.intimetec.newsportal.mapper.NotificationMapper;
 import com.intimetec.newsportal.model.*;
 import com.intimetec.newsportal.repository.CategoryRepository;
 import com.intimetec.newsportal.repository.NotificationRepository;
@@ -37,6 +39,7 @@ public class NotificationServiceImpl implements NotificationService {
     public void updateUserCategoryPreference(Long userId,CategoryNotificationPreferenceDTO categoryNotificationPreferenceDTO){
         User user = userRepository.getReferenceById(userId);
         Category category = categoryRepository.findByCategoryName(categoryNotificationPreferenceDTO.getCategoryName());
+
         UserCategoryPreference userCategoryPreference = new UserCategoryPreference();
         userCategoryPreference.setUser(user);
         userCategoryPreference.setCategory(category);
@@ -48,42 +51,6 @@ public class NotificationServiceImpl implements NotificationService {
     public void notifyUsersForMatchingArticles(List<Article> articleList) {
 
         Map<User, Set<Article>> userToArticlesMap = mapUsersToNotifiableArticles(articleList);
-//        Map<Integer, Set<Article>> categoryIdToArticleList = new HashMap<>();
-//        if (!articleList.isEmpty()) {
-//            for (Article article : articleList) {
-//                Set<Category> categorySet = article.getCategories();
-//                if (categorySet != null && !categorySet.isEmpty()) {
-//                    for (Category category : categorySet) {
-//                        Integer categoryId = category.getCategoryId();
-//                        categoryIdToArticleList.computeIfAbsent(categoryId, k -> new HashSet<>()).add(article);
-//                    }
-//                }
-//            }
-//        }
-//
-//        List<UserCategoryPreference> userCategoryPreferenceList = userCategoryPreferenceRepository.findAll();
-//
-//        Map<User, Set<Integer>> userIdToCategoryIdsMap = new HashMap<>();
-//        for (UserCategoryPreference userCategoryPreference : userCategoryPreferenceList) {
-//            User user = userCategoryPreference.getUser();
-//            userIdToCategoryIdsMap.putIfAbsent(user, new HashSet<>());
-//            if (userCategoryPreference.getNotificationsEnabled()) {
-//                userIdToCategoryIdsMap.get(user).add(userCategoryPreference.getCategory().getCategoryId());
-//            }
-//        }
-//
-//        Set<User> userSet = userIdToCategoryIdsMap.keySet();
-//        Map<User, Set<Article>> userToArticlesMap = new HashMap<>();
-//
-//        for (User user : userSet) {
-//            Set<Article> articleSet = new HashSet<>();
-//            for (Integer categoryId : userIdToCategoryIdsMap.get(user)) {
-//                if (categoryIdToArticleList.containsKey(categoryId)) {
-//                    articleSet.addAll(categoryIdToArticleList.get(categoryId));
-//                }
-//            }
-//            userToArticlesMap.put(user, articleSet);
-//        }
         List<Notification> notificationList = new ArrayList<>();
 
         for (User user : userToArticlesMap.keySet()) {
@@ -147,6 +114,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<NotificationDTO> getUserNotifications(Long userId) {
-        return List.of();
+        List<Notification> notificationList = notificationRepository.findByUser_Id(userId);
+        List<NotificationDTO> notificationDTOList = NotificationMapper.toDTOList(notificationList);
+        return notificationDTOList;
     }
+
 }

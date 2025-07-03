@@ -1,9 +1,9 @@
-package com.intimetec.newsportal.console.app;
+package com.intimetec.newsportal.console.app.menu;
 
+import com.intimetec.newsportal.console.app.session.UserSession;
 import com.intimetec.newsportal.console.dto.ArticleDTO;
 import com.intimetec.newsportal.console.dto.HeadlineRequestDTO;
 import com.intimetec.newsportal.console.service.ArticleService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,7 +29,7 @@ public class UserMenuHandler {
                 case "1" -> handleHeadlines();
                 case "2" -> System.out.println("[TODO] Show saved articles");
                 case "3" -> System.out.println("[TODO] Implement search");
-                case "4" -> System.out.println("[TODO] Show/Configure notifications");
+                case "4" -> notififetchUserNotifications(UserSession.getUserId());
                 case "5" -> {
                     System.out.println("Logging out...");
                     return;
@@ -107,7 +107,8 @@ public class UserMenuHandler {
         } else {
             System.out.println("\nHEADLINES:");
             for (ArticleDTO article : articles) {
-                System.out.print("Article Id: "+ article.getArticleId() +"\n" + article.getTitle() + "\n" + article.getDescription() + "\n" + "Source: "+  article.getSource() + "\n" + "URL : " + article.getUrl()+"\n\n");
+                System.out.print("Article Id: "+ article.getArticleId() +"\n" + article.getTitle() + "\n" + article.getDescription() + "\n" + "Source: "+  article.getSource() + "\n" + "URL : " + article.getUrl()+"\n");
+                System.out.print("Categories : "+article.getCategories().toString()+"\n");
             }
         }
     }

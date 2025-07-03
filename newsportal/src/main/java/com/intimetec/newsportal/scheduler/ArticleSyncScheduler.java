@@ -41,10 +41,6 @@ public class ArticleSyncScheduler {
     public void fetchArticle() {
         List<ArticleDTO> articleDTOList = newsProviderFactory.getBestNewsApiClient().getArticlesPeriodically();
         List<Article> articleList =  articleService.saveArticles(articleDTOList);
-//        System.out.println("ARticles List : ");
-//        for(Article article : articleList){
-//            System.out.println(article.toString());
-//        }
         notificationService.notifyUsersForMatchingArticles(articleList);
     }
 }

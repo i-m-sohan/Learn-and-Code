@@ -1,15 +1,16 @@
 package com.intimetec.newsportal.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "keyword")
 public class Keyword {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "keyword_id")
+    private Integer keywordId;
+
     @Column(name = "keyword", nullable = false, unique = true)
     private String keyword;
 
@@ -17,6 +18,14 @@ public class Keyword {
 
     public Keyword(String keyword) {
         this.keyword = keyword;
+    }
+
+    public Integer getKeywordId() {
+        return keywordId;
+    }
+
+    public void setKeywordId(Integer keywordId) {
+        this.keywordId = keywordId;
     }
 
     public String getKeyword() {
@@ -30,7 +39,9 @@ public class Keyword {
     @Override
     public String toString() {
         return "Keyword{" +
-                "keyword='" + keyword + '\'' +
+                "keywordId=" + keywordId +
+                ", keyword='" + keyword + '\'' +
                 '}';
     }
 }
+

@@ -13,6 +13,8 @@ public class ArticleDTO {
     private String url;
     private LocalDateTime publishedDate;
     private List<String> categories;
+    private Integer likesCount;
+    private Integer dislikesCount;
 
     public ArticleDTO() {}
 
@@ -86,6 +88,22 @@ public class ArticleDTO {
 
     public List<String> getCategories() {
         return categories;
+    }
+
+    public Integer getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(Integer likesCount) {
+        this.likesCount = likesCount;
+    }
+
+    public Integer getDislikesCount() {
+        return dislikesCount;
+    }
+
+    public void setDislikesCount(Integer dislikesCount) {
+        this.dislikesCount = dislikesCount;
     }
 
     @Override

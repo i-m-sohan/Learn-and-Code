@@ -1,4 +1,4 @@
-package com.intimetec.newsportal.console.app;
+package com.intimetec.newsportal.console.app.menu;
 
 import com.intimetec.newsportal.console.dto.CreateCategoryDTO;
 import com.intimetec.newsportal.console.dto.ExternalServerDetailDTO;

@@ -40,6 +40,18 @@ public class ArticleService {
             return List.of();
         }
     }
+    public void fetchUserNotifications(Long userId) {
+        try {
+            String endpoint = BASE_URL + "/notification/" + userId;
+            String response = ApiUtilis.sendGetRequest(endpoint);
+            System.out.println("🔔 Your Notifications:");
+            System.out.println(response);
+        } catch (Exception e) {
+            System.out.println("⚠️ Failed to fetch notifications: " + e.getMessage());
+        }
+    }
+
+
 }
 
 

@@ -1,14 +1,8 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
 import com.intimetec.newsportal.dto.CategoryKeywordDTO;
-import com.intimetec.newsportal.model.Category;
-import com.intimetec.newsportal.model.CategoryKeyword;
-import com.intimetec.newsportal.model.Keyword;
-import com.intimetec.newsportal.model.User;
-import com.intimetec.newsportal.repository.CategoryKeywordRepository;
-import com.intimetec.newsportal.repository.CategoryRepository;
-import com.intimetec.newsportal.repository.KeywordRepository;
-import com.intimetec.newsportal.repository.UserRepository;
+import com.intimetec.newsportal.model.*;
+import com.intimetec.newsportal.repository.*;
 import com.intimetec.newsportal.service.CategoryService;
 import com.intimetec.newsportal.service.KeywordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class KeywordServiceImpl implements KeywordService {
@@ -33,51 +29,78 @@ public class KeywordServiceImpl implements KeywordService {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    UserCategoryKeywordRepository userCategoryKeywordRepository;
+
     @Override
-    public void saveUserCategoryKeyword(CategoryKeywordDTO categoryKeywordDTO) {
-//        User user = userRepository.getReferenceById(categoryKeywordDTO.getUserId());
-//        Category category = categoryRepository.findByCategoryName(categoryKeywordDTO.getCategoryName());
-//
-//        List<String> keywordNameList = categoryKeywordDTO.getKeywords();
-//
-//        List<Keyword> keywordEntityList = new ArrayList<>();
-//        for(String keywordName : keywordNameList){
-//            Keyword keyword = new Keyword();
-//            keyword.setKeyword(keywordName);
-//            keywordEntityList.add(keyword);
-//        }
-//
-//        List<Keyword> createdKeywordList =  keywordRepository.saveAll(keywordEntityList);
+    public void saveUserCategoryKeyword(Long userId, CategoryKeywordDTO categoryKeywordDTO) {
+        System.out.println("Inside service method");
+        User user = userRepository.getReferenceById(userId);
+        Category category = categoryRepository.findByCategoryName(categoryKeywordDTO.getCategoryName());
+
+        List<String> keywordNames = categoryKeywordDTO.getKeywords();
+        List<Keyword> existingKeywords = keywordRepository.findByKeywordIn(keywordNames);
+        Set<String> existingKeywordNames = getExistingKeywordNames(existingKeywords);
+
+        for(Keyword keyword : existingKeywords){
+            System.out.println(keyword.toString());
+        }
+
+        List<Keyword> newKeywords = getNewKeywords(keywordNames,existingKeywordNames);
+
+        List<Keyword> savedNewKeywords = keywordRepository.saveAll(newKeywords);
+        List<Keyword> keywordEntityList = new ArrayList<>();
+        List<Keyword> allKeywords = new ArrayList<>(existingKeywords);
+        allKeywords.addAll(savedNewKeywords);
+
+        System.out.println("-------------------------");
+        for(Keyword keyword : allKeywords){
+            System.out.println(keyword.toString());
+        }
+        for (Keyword keyword : allKeywords) {
+            boolean exists = userCategoryKeywordRepository
+                    .existsByUserAndCategoryAndKeyword(user, category, keyword);
+            if (!exists) {
+                UserCategoryKeyword userCategoryKeyword = new UserCategoryKeyword(user, category, keyword);
+                userCategoryKeywordRepository.save(userCategoryKeyword);
+            }
+        }
     }
 
-    public void addUCategoryKeyword(@RequestBody CategoryKeywordDTO categoryKeywordDTO){
-        List<String> categoryNames = new ArrayList<>();
-        categoryNames.add(categoryKeywordDTO.getCategoryName());
+    private Set<String> getExistingKeywordNames(List<Keyword> existingKeywords){
+        Set<String> existingKeywordNames = existingKeywords.stream()
+                .map(Keyword::getKeyword)
+                .collect(Collectors.toSet());
+        return existingKeywordNames;
+    }
 
-        List<Category> categoryList = categoryService.ensureCategoriesExist(categoryNames);
+    private List<Keyword> getNewKeywords(List<String> keywordNames, Set<String> existingKeywordNames){
+        List<Keyword> newKeywords = keywordNames.stream()
+                .filter(keywordName -> !existingKeywordNames.contains(keywordName))
+                .map(kw -> {
+                    Keyword keyword = new Keyword();
+                    keyword.setKeyword(kw);
+                    return keyword;
+                })
+                .collect(Collectors.toList());
+        return newKeywords;
+    }
 
-        List<Keyword> keywordList = new ArrayList<>();
+    public void removeUserCategoryKeyword(Long userId, CategoryKeywordDTO categoryKeywordDTO){
+        User user = userRepository.getReferenceById(userId);
+        Category category = categoryRepository.findByCategoryName(categoryKeywordDTO.getCategoryName());
 
-        List<String> keywordNameList = categoryKeywordDTO.getKeywords();
+        List<String> keywordNames = categoryKeywordDTO.getKeywords();
+        List<Keyword> keywords = keywordRepository.findByKeywordIn(keywordNames);
 
-        List<Keyword> keywordEntityList = new ArrayList<>();
+        List<UserCategoryKeyword> userCategoryKeywordToDelete = userCategoryKeywordRepository
+                .findByUserAndCategoryAndKeywordIn(user, category, keywords);
 
-        for(String keywordName : keywordNameList){
-            Keyword keyword = new Keyword();
-            keyword.setKeyword(keywordName);
-            keywordEntityList.add(keyword);
+        if (!userCategoryKeywordToDelete.isEmpty()) {
+            userCategoryKeywordRepository.deleteAll(userCategoryKeywordToDelete);
         }
-        List<Keyword> createdKeywordList = keywordRepository.saveAll(keywordEntityList);
-
-        List<CategoryKeyword> categoryKeywordList = new ArrayList<>();
-
-        for(Keyword keyword : createdKeywordList){
-            CategoryKeyword categoryKeyword = new CategoryKeyword();
-            categoryKeyword.setCategory(categoryList.get(0));
-            categoryKeyword.setKeyword(keyword);
-            categoryKeywordList.add(categoryKeyword);
-        }
-
-        categoryKeywordRepository.saveAll(categoryKeywordList);
     }
 }

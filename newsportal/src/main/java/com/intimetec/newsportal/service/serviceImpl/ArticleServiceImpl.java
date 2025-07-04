@@ -1,16 +1,24 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
 import com.intimetec.newsportal.dto.ArticleDTO;
+import com.intimetec.newsportal.dto.ArticleReactionRequestDTO;
 import com.intimetec.newsportal.dto.HeadlineRequestDTO;
 import com.intimetec.newsportal.mapper.ArticleMapper;
+import com.intimetec.newsportal.mapper.ReactionMapper;
 import com.intimetec.newsportal.model.Article;
 import com.intimetec.newsportal.model.Category;
+import com.intimetec.newsportal.model.Reaction;
+import com.intimetec.newsportal.model.User;
+import com.intimetec.newsportal.model.enums.ReactionType;
 import com.intimetec.newsportal.repository.ArticleRepository;
+import com.intimetec.newsportal.repository.ReactionRepository;
+import com.intimetec.newsportal.repository.UserRepository;
 import com.intimetec.newsportal.service.ArticleService;
 import com.intimetec.newsportal.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -20,6 +28,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ReactionRepository reactionRepository;
 
     @Override
     public List<ArticleDTO> getHeadlineArticles(HeadlineRequestDTO headlineRequestDTO){

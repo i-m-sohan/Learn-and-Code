@@ -1,6 +1,6 @@
 package com.intimetec.newsportal.dto;
 
-public class UserArticleRequestDTO{
+public class SaveOrRemoveArticleDTO{
     private Long userId;
     private Integer articleId;
 

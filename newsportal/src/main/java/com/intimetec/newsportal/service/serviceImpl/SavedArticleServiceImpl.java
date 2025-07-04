@@ -1,7 +1,7 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
 import com.intimetec.newsportal.dto.ArticleDTO;
-import com.intimetec.newsportal.dto.UserArticleRequestDTO;
+import com.intimetec.newsportal.dto.SaveOrRemoveArticleDTO;
 import com.intimetec.newsportal.mapper.ArticleMapper;
 import com.intimetec.newsportal.model.Article;
 import com.intimetec.newsportal.model.User;
@@ -29,7 +29,7 @@ public class SavedArticleServiceImpl implements SavedArticleService {
     ArticleRepository articleRepository;
 
     @Override
-    public void saveUserArticle(UserArticleRequestDTO saveUserArticleRequestDTO){
+    public void saveUserArticle(SaveOrRemoveArticleDTO saveUserArticleRequestDTO){
         Long userId = saveUserArticleRequestDTO.getUserId();
         Integer articleId = saveUserArticleRequestDTO.getArticleId();
         User user = userRepository.findById(userId)
@@ -44,7 +44,7 @@ public class SavedArticleServiceImpl implements SavedArticleService {
     }
 
     @Override
-    public void deleteSavedArticle(UserArticleRequestDTO saveUserArticleRequestDTO){
+    public void deleteSavedArticle(SaveOrRemoveArticleDTO saveUserArticleRequestDTO){
         Long userId = saveUserArticleRequestDTO.getUserId();
         Integer articleId = saveUserArticleRequestDTO.getArticleId();
         User user = userRepository.findById(userId)

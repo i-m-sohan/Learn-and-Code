@@ -6,19 +6,16 @@ import com.intimetec.newsportal.dto.ReportedArticleDTO;
 import com.intimetec.newsportal.dto.ReportedArticleSummaryDTO;
 import com.intimetec.newsportal.mapper.ArticleMapper;
 import com.intimetec.newsportal.model.Article;
+import com.intimetec.newsportal.model.ArticleCategory;
+import com.intimetec.newsportal.model.Category;
 import com.intimetec.newsportal.model.ReportedArticle;
-import com.intimetec.newsportal.repository.ArticleRepository;
+import com.intimetec.newsportal.repository.*;
 import com.intimetec.newsportal.mapper.ReportedArticleMapper;
-import com.intimetec.newsportal.repository.ReportedArticleRepository;
-import com.intimetec.newsportal.repository.UserRepository;
 import com.intimetec.newsportal.service.ArticleFlagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ArticleFlagServiceImpl implements ArticleFlagService {
@@ -27,15 +24,45 @@ public class ArticleFlagServiceImpl implements ArticleFlagService {
     ArticleRepository articleRepository;
 
     @Autowired
+    CategoryRepository categoryRepository;
+
+    @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ArticleCategoryRepository articleCategoryRepository;
 
     @Autowired
     ReportedArticleRepository reportedArticleRepository;
 
     @Override
     public void flagArticle(ArticleFlagRequestDTO articleFlagRequestDTO){
-        ReportedArticle report = ReportedArticleMapper.toEntity(articleFlagRequestDTO);
-        reportedArticleRepository.save(report);
+        ReportedArticle reportedArticle = ReportedArticleMapper.toEntity(articleFlagRequestDTO);
+
+        reportedArticleRepository.save(reportedArticle);
+
+        Article article = articleRepository.getReferenceById(articleFlagRequestDTO.getArticleId());
+        List<ArticleCategory> articleCategoryList = articleCategoryRepository.findByArticleId(article.getArticleId());
+
+        Set<Integer> categoryIds = new HashSet<>();
+        for(ArticleCategory articleCategory : articleCategoryList){
+            categoryIds.add(articleCategory.getCategoryId());
+        }
+
+        List<Category> categoryList = categoryRepository.findAllById(categoryIds);
+        System.out.println("Reporting the article : " + article.getArticleId());
+
+        for(Category category : categoryList){
+            System.out.println(category.getCategoryName());
+        }
+
+        ArticleDTO articleDTO = ArticleMapper.toDTO(article);
+        if(articleDTO.getReportCount()>3){
+            articleDTO.setIsVisible(false);
+        }
+        Article articleUpdated = ArticleMapper.toEntity(articleDTO);
+        articleUpdated.setCategories(new HashSet<>(categoryList));
+        articleRepository.save(articleUpdated);
     }
 
     @Override

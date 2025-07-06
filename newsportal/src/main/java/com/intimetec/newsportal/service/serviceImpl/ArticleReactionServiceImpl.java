@@ -35,13 +35,11 @@ public class ArticleReactionServiceImpl implements ArticleReactionService {
     @Override
     public void handleArticelReaction(ArticleReactionRequestDTO articleReactionRequestDTO) {
 
-        User user = userRepository.findById(articleReactionRequestDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Article article = articleRepository.findById(articleReactionRequestDTO.getArticleId())
-                .orElseThrow(() -> new RuntimeException("Article not found"));
+        Long userId = articleReactionRequestDTO.getUserId();
+        Integer articleId = articleReactionRequestDTO.getArticleId();
 
         ReactionType newReactionType = ReactionType.valueOf(articleReactionRequestDTO.getReactionType().toUpperCase());
-        Optional<Reaction> existingReactionOpt = reactionRepository.findByUserAndArticle(user, article);
+        Optional<Reaction> existingReactionOpt = reactionRepository.findByUserIdAndArticleId(userId, articleId);
 
         Reaction reaction;
         if (existingReactionOpt.isPresent()) {
@@ -53,7 +51,7 @@ public class ArticleReactionServiceImpl implements ArticleReactionService {
             reaction.setReactionType(newReactionType);
             reaction.setReactedAt(LocalDateTime.now());
         } else {
-            reaction = ReactionMapper.toEntity(articleReactionRequestDTO, user, article);
+            reaction = ReactionMapper.toEntity(articleReactionRequestDTO);
         }
 
         reactionRepository.save(reaction);

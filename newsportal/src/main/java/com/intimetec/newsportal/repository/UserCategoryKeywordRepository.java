@@ -4,6 +4,7 @@ import com.intimetec.newsportal.model.UserCategoryKeyword;
 import com.intimetec.newsportal.model.User;
 import com.intimetec.newsportal.model.Category;
 import com.intimetec.newsportal.model.Keyword;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -21,4 +22,6 @@ public interface UserCategoryKeywordRepository extends JpaRepository<UserCategor
 
     List<UserCategoryKeyword> findByUserAndCategoryAndKeywordIn(User user, Category category, List<Keyword> keywords);
 
+    @Transactional
+    List<UserCategoryKeyword> findByCategoryIn(List<Category> categories);
 }

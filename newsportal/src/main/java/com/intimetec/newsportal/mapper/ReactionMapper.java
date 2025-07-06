@@ -10,13 +10,14 @@ import java.time.LocalDateTime;
 
 public class ReactionMapper {
 
-    public static Reaction toEntity(ArticleReactionRequestDTO dto, User user, Article article) {
+    public static Reaction toEntity(ArticleReactionRequestDTO dto) {
         Reaction reaction = new Reaction();
-        reaction.setUser(user);
-        reaction.setArticle(article);
+        reaction.setUserId(dto.getUserId());
+        reaction.setArticleId(dto.getArticleId());
         reaction.setReactionType(ReactionType.valueOf(dto.getReactionType().toUpperCase()));
         reaction.setReactedAt(LocalDateTime.now());
         return reaction;
     }
 
 }
+

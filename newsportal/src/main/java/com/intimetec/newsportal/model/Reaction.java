@@ -13,13 +13,11 @@ public class Reaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reactionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    @Column(name = "userId", nullable = false)
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "articleId", nullable = false)
-    private Article article;
+    @Column(name = "articleId", nullable = false)
+    private Integer articleId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -27,6 +25,8 @@ public class Reaction {
 
     @Column(nullable = false)
     private LocalDateTime reactedAt = LocalDateTime.now();
+
+    // Getters and Setters
 
     public Long getReactionId() {
         return reactionId;
@@ -36,20 +36,20 @@ public class Reaction {
         this.reactionId = reactionId;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public Article getArticle() {
-        return article;
+    public Integer getArticleId() {
+        return articleId;
     }
 
-    public void setArticle(Article article) {
-        this.article = article;
+    public void setArticleId(Integer articleId) {
+        this.articleId = articleId;
     }
 
     public ReactionType getReactionType() {
@@ -68,4 +68,3 @@ public class Reaction {
         this.reactedAt = reactedAt;
     }
 }
-

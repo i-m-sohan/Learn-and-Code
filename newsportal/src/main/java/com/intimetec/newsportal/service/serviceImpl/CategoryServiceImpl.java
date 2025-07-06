@@ -116,7 +116,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         if(categoryMatchCountMap.isEmpty()){
-            articleDTO.setCategories(List.of("General"));
+            articleDTO.setCategories(List.of("general"));
             return;
         }
 

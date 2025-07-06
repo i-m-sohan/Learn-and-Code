@@ -1,14 +1,12 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
+import com.intimetec.newsportal.dto.ArticleDTO;
 import com.intimetec.newsportal.dto.CategoryKeywordDTO;
 import com.intimetec.newsportal.dto.CategoryNotificationPreferenceDTO;
 import com.intimetec.newsportal.dto.NotificationDTO;
 import com.intimetec.newsportal.mapper.NotificationMapper;
 import com.intimetec.newsportal.model.*;
-import com.intimetec.newsportal.repository.CategoryRepository;
-import com.intimetec.newsportal.repository.NotificationRepository;
-import com.intimetec.newsportal.repository.UserCategoryPreferenceRepository;
-import com.intimetec.newsportal.repository.UserRepository;
+import com.intimetec.newsportal.repository.*;
 import com.intimetec.newsportal.service.EmailService;
 import com.intimetec.newsportal.service.NotificationService;
 import jakarta.transaction.Transactional;
@@ -34,7 +32,16 @@ public class NotificationServiceImpl implements NotificationService {
     UserCategoryPreferenceRepository userCategoryPreferenceRepository;
 
     @Autowired
+    UserCategoryKeywordRepository userCategoryKeywordRepository;
+
+    @Autowired
+    KeywordRepository keywordRepository;
+
+    @Autowired
     NotificationRepository notificationRepository;
+
+    @Autowired
+    CategoryKeywordRepository categoryKeywordRepository;
 
     public void updateUserCategoryPreference(Long userId,CategoryNotificationPreferenceDTO categoryNotificationPreferenceDTO){
         User user = userRepository.getReferenceById(userId);
@@ -48,28 +55,83 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Transactional
     @Override
-    public void notifyUsersForMatchingArticles(List<Article> articleList) {
+    public void notifyUsersForMatchingArticles(List<ArticleDTO> articleDTOList) {
+        System.out.println("🔍 Starting user notification process for matching articles...");
 
-        Map<User, Set<Article>> userToArticlesMap = mapUsersToNotifiableArticles(articleList);
-        List<Notification> notificationList = new ArrayList<>();
-
-        for (User user : userToArticlesMap.keySet()) {
-            Set<Article> articles = userToArticlesMap.get(user);
-            if (articles != null && !articles.isEmpty()) {
-                String mailBody = "";
-                for (Article article : articles) {
-                    Notification notification = new Notification();
-                    notification.setArticle(article);
-                    notification.setUser(user);
-                    notification.setCreatedAt(LocalDateTime.now());
-                    notification.setMessage(article.getTitle());
-                    notificationList.add(notification);
-                    mailBody += "Article Title : " + article.getTitle() + "\n" + "Article URL : " + article.getUrl() + "\n";
+        List<String> categoryNames = new ArrayList<>();
+        for (ArticleDTO articleDTO : articleDTOList) {
+            List<String> currentArticleCategoryNames = articleDTO.getCategories();
+            if (currentArticleCategoryNames != null && !currentArticleCategoryNames.isEmpty()) {
+                for (String categoryName : currentArticleCategoryNames) {
+                    if (categoryName != null && !categoryNames.contains(categoryName)) {
+                        categoryNames.add(categoryName);
+                    }
                 }
-                emailService.sendEmail(user.getEmail(), "Latest Articles Based on Your Preferences", mailBody);
             }
         }
-        notificationRepository.saveAll(notificationList);
+
+        System.out.println("🧾 Extracted visible category names from articles: " + categoryNames);
+
+        List<Category> categoryList = categoryRepository.findByCategoryNameInAndIsVisibleTrue(categoryNames);
+        System.out.println("✅ Retrieved visible Category entities from DB: " + categoryList.size());
+
+        Map<String, Category> nameToCategoryMap = new HashMap<>();
+        for (Category category : categoryList) {
+            if (category != null && !nameToCategoryMap.containsKey(category.getCategoryName())) {
+                nameToCategoryMap.put(category.getCategoryName(), category);
+            }
+        }
+
+        List<CategoryKeyword> categoryKeywordList = categoryKeywordRepository.findByCategoryIn(categoryList);
+        System.out.println("🔑 Retrieved CategoryKeywords for categories: " + categoryKeywordList.size());
+
+        List<UserCategoryKeyword> userCategoryKeywordList = userCategoryKeywordRepository.findByCategoryIn(categoryList);
+        System.out.println("👥 Retrieved UserCategoryKeywords for categories: " + userCategoryKeywordList.size());
+
+        Map<User, List<ArticleDTO>> userToArticlesMap = new HashMap<>();
+
+        for (UserCategoryKeyword userCategoryKeyword : userCategoryKeywordList) {
+            Keyword keyword = userCategoryKeyword.getKeyword();
+            User user = userCategoryKeyword.getUser();
+            Category category = userCategoryKeyword.getCategory();
+
+            String keywordValue = keyword.getKeyword();
+            for (ArticleDTO articleDTO : articleDTOList) {
+                String title = articleDTO.getTitle() != null ? articleDTO.getTitle() : "";
+                String description = articleDTO.getDescription() != null ? articleDTO.getDescription() : "";
+                String content = articleDTO.getContent() != null ? articleDTO.getContent() : "";
+                String articleCombinedText = (title + " " + description + " " + content).toLowerCase();
+
+                if (articleCombinedText.contains(keywordValue.toLowerCase())) {
+                    userToArticlesMap.computeIfAbsent(user, k -> new ArrayList<>()).add(articleDTO);
+                    System.out.println("📌 Matched keyword '" + keywordValue + "' for user: " + user.getUsername() + " in article ID: " + articleDTO.getArticleId());
+                }
+            }
+        }
+
+        List<Notification> notificationList = new ArrayList<>();
+        for (User user : userToArticlesMap.keySet()) {
+            List<ArticleDTO> articles = userToArticlesMap.get(user);
+            if (articles != null && !articles.isEmpty()) {
+                StringBuilder mailBody = new StringBuilder();
+                for (ArticleDTO articleDTO : articles) {
+                    Notification notification = new Notification();
+                    notification.setUser(user);
+                    notification.setCreatedAt(LocalDateTime.now());
+                    notification.setMessage(articleDTO.getTitle());
+                    notificationList.add(notification);
+                    mailBody.append("-------------------\n")
+                            .append("Article Title : ").append(articleDTO.getTitle()).append("\n")
+                            .append("Article URL   : ").append(articleDTO.getUrl()).append("\n");
+                }
+                System.out.println("📧 Sending email to " + user.getEmail() + " with " + articles.size() + " articles.");
+                emailService.sendEmail(user.getEmail(), "Latest Articles Based on Your Preferences", mailBody.toString());
+            }
+        }
+
+        System.out.println("🔔 Total notifications to save: " + notificationList.size());
+//    notificationRepository.saveAll(notificationList);
+        System.out.println("✅ Notification process completed.");
     }
 
     private Map<User, Set<Article>> mapUsersToNotifiableArticles(List<Article> articleList){

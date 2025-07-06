@@ -54,6 +54,6 @@ public class ArticleSyncScheduler {
 //        }
 
 //        List<Article> articleList =  articleService.saveArticles(articleDTOList);
-//        notificationService.notifyUsersForMatchingArticles(articleList);
+        notificationService.notifyUsersForMatchingArticles(articleDTOList);
     }
 }

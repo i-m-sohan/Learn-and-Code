@@ -12,6 +12,6 @@ public interface ReportedArticleRepository extends JpaRepository<ReportedArticle
 
     int countByArticleId(Integer articleId);
     List<ReportedArticle> findByArticleIdIn(List<Integer> articleIds);
-
+    List<ReportedArticle> findByUserId(Long userId);
 }
 

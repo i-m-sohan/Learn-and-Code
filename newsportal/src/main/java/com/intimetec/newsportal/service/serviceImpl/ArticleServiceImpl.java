@@ -36,7 +36,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleDTO> getHeadlineArticles(HeadlineRequestDTO headlineRequestDTO){
-        List<Article> articleList =  articleRepository.findByPublishedDateBetween(headlineRequestDTO.getStartDate(),headlineRequestDTO.getEndDate());
+        List<Article> articleList =  articleRepository.findByPublishedDateBetweenAndIsVisibleTrue(headlineRequestDTO.getStartDate(),headlineRequestDTO.getEndDate());
 
         List<Article> finalisedArticleList = new ArrayList<>();
         String categoryName = headlineRequestDTO.getCategory();
@@ -63,9 +63,19 @@ public class ArticleServiceImpl implements ArticleService {
     public void saveArticles(List<ArticleDTO> articleDTOList){
 
         List<String> allCategoryNames = extractAllCategoryNames(articleDTOList);
+        System.out.println("##### All Category Names : ");
+        System.out.println(allCategoryNames);
+
         List<Category> categoryList = ensureCategoriesExist(allCategoryNames);
+        for(Category category : categoryList){
+            System.out.println(category.getCategoryName());
+            System.out.println(category.isVisible());
+        }
 
         Map<String,Category> categoryNameToCategoryMap = buildCategoryNameToCategoryMap(categoryList);
+
+        System.out.println(categoryNameToCategoryMap.keySet());
+
         List<Article> articleList = constructArticleEntities(articleDTOList, categoryNameToCategoryMap);
         articleRepository.saveAll(articleList);
     }
@@ -81,8 +91,8 @@ public class ArticleServiceImpl implements ArticleService {
         List<String> categoryNames = new ArrayList<>();
         for(ArticleDTO articleDTO : articleDTOList){
             for(String categoryName : articleDTO.getCategories()){
-                if(!categoryNames.contains(categoryName)){
-                    categoryNames.add(categoryName);
+                if(categoryName != null && !categoryNames.contains(categoryName.toLowerCase())){
+                    categoryNames.add(categoryName.toLowerCase());
                 }
             }
         }
@@ -93,7 +103,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Map<String, Category> categoryNameToCategoryMap = new HashMap<>();
         for(Category category : categoryList){
-            categoryNameToCategoryMap.put(category.getCategoryName(),category);
+            categoryNameToCategoryMap.put(category.getCategoryName().toLowerCase(),category);
         }
         return categoryNameToCategoryMap;
     }
@@ -134,9 +144,20 @@ public class ArticleServiceImpl implements ArticleService {
             Article article = ArticleMapper.toEntity(articleDTO);
             Set<Category> categorySet = article.getCategories();
             List<String> categoryNames = articleDTO.getCategories();
+            Boolean isVisible = true;
+
+            System.out.println("Inside the consturctiion of entieies now : ");
             for(String categoryName : categoryNames){
+                Category category = categoryMap.get(categoryName);
+                System.out.println(categoryName);
+
+                if(category != null && !category.isVisible()){
+                    isVisible = false;
+                }
                 categorySet.add(categoryMap.get(categoryName));
             }
+
+            article.setVisible(isVisible);
             article.setCategories(categorySet);
             articleList.add(article);
         }

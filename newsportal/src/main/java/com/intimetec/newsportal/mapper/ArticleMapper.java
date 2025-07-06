@@ -3,6 +3,7 @@ package com.intimetec.newsportal.mapper;
 import com.intimetec.newsportal.dto.ArticleDTO;
 import com.intimetec.newsportal.model.Article;
 import com.intimetec.newsportal.model.Category;
+import jakarta.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,12 +26,6 @@ public class ArticleMapper {
         dto.setDislikesCount(article.getDislikesCount());
         dto.setReportCount(article.getReportCount());
         dto.setIsVisible(article.isVisible());
-
-        List<String> categoryNamesList = new ArrayList<>();
-        for(Category category : article.getCategories()){
-            categoryNamesList.add(category.getCategoryName());
-        }
-        dto.setCategories(categoryNamesList);
         return dto;
     }
 
@@ -62,6 +57,8 @@ public class ArticleMapper {
 
         return articleList;
     }
+
+    @Transactional
     public static List<ArticleDTO> toDTOList(List<Article> articleList) {
         if (articleList == null) return List.of();
 

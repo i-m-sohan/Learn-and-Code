@@ -13,6 +13,8 @@ public class NewsAggregationPortalApplication {
 
 	public static void main(String[] args) {
 		var context = SpringApplication.run(NewsAggregationPortalApplication.class, args);
+		ArticleSyncScheduler scheduler = context.getBean(ArticleSyncScheduler.class);
+		scheduler.fetchArticle();
 	}
 
 }

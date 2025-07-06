@@ -15,4 +15,5 @@ public interface ExternalNewsSourceService {
     public void updateServerDetails(ExternalServerUpdateDTO externalServerUpdateDTO);
     public List<ExternalNewsSourceDTO> findAllByOrderByLastAccessedAsc();
     public void updateNewsSourceLastAccessed(ExternalNewsSourceDTO externalNewsSourceDTO);
+    public List<ExternalNewsSourceDTO> getAllAvailableExternalNewsSources();
 }

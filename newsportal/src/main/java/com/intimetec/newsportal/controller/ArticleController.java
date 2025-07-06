@@ -1,6 +1,7 @@
 package com.intimetec.newsportal.controller;
 
 import com.intimetec.newsportal.dto.*;
+import com.intimetec.newsportal.service.ArticleFlagService;
 import com.intimetec.newsportal.service.ArticleReactionService;
 import com.intimetec.newsportal.service.ArticleService;
 import com.intimetec.newsportal.service.SavedArticleService;
@@ -24,6 +25,9 @@ public class ArticleController {
 
     @Autowired
     ArticleReactionService articleReactionService;
+
+    @Autowired
+    ArticleFlagService articleFlagService;
 
     @PostMapping("/headlines")
     public ResponseEntity<?> getHeadlines(@RequestBody HeadlineRequestDTO headlineRequestDTO){
@@ -57,8 +61,8 @@ public class ArticleController {
 
     @PostMapping("/report")
     public ResponseEntity<?> reportArticle(@RequestBody ArticleFlagRequestDTO articleFlagRequestDTO){
-
-        return new ResponseEntity<>(Map.of("Articles",articleDTOList),HttpStatus.OK);
+        articleFlagService.flagArticle(articleFlagRequestDTO);
+        return new ResponseEntity<>(Map.of("Message","Article Reported Successfully!"),HttpStatus.OK);
     }
 
     @GetMapping("/saved-articles/{userId}")
@@ -66,4 +70,18 @@ public class ArticleController {
         List<ArticleDTO> articleDTOList =  savedArticleService.getSavedArticles(userId);
         return new ResponseEntity<>(Map.of("Saved Articles",articleDTOList),HttpStatus.OK);
     }
+
+    @GetMapping("/reported-summary")
+    public ResponseEntity<?> getReportedArticlesSummary(){
+        System.out.println("In controller");
+        List<ReportedArticleSummaryDTO> reportedArticleSummaryDTOList = articleFlagService.getReportedArticleSummary();
+        return new ResponseEntity<>(Map.of("Reported Articles's Summary",reportedArticleSummaryDTOList),HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/hide/{articleId}")
+    public ResponseEntity<?> hideArticle(@PathVariable Integer articleId) {
+        articleService.hidArticle(articleId);
+        return new ResponseEntity<>(Map.of("Message","Article Hidden Successfully!"),HttpStatus.OK);
+    }
+
 }

@@ -31,7 +31,6 @@ public class ReportedArticle {
         this.reportedAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
     public Long getReportId() {
         return reportId;
     }

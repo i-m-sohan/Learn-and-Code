@@ -23,6 +23,8 @@ public class ArticleMapper {
         dto.setPublishedDate(article.getPublishedDate());
         dto.setLikesCount(article.getLikesCount());
         dto.setDislikesCount(article.getDislikesCount());
+        dto.setReportCount(article.getReportCount());
+        dto.setIsVisible(article.isVisible());
 
         List<String> categoryNamesList = new ArrayList<>();
         for(Category category : article.getCategories()){
@@ -45,7 +47,8 @@ public class ArticleMapper {
         article.setPublishedDate(dto.getPublishedDate());
         article.setLikesCount(dto.getLikesCount());
         article.setDislikesCount(dto.getDislikesCount());
-
+        article.setReportCount(dto.getReportCount());
+        article.setVisible(dto.getIsVisible());
         return article;
     }
 

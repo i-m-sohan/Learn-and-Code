@@ -1,24 +1,20 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
+import com.intimetec.newsportal.client.NewsClient;
 import com.intimetec.newsportal.dto.ArticleDTO;
-import com.intimetec.newsportal.dto.ArticleReactionRequestDTO;
 import com.intimetec.newsportal.dto.HeadlineRequestDTO;
+import com.intimetec.newsportal.factory.NewsProviderFactory;
 import com.intimetec.newsportal.mapper.ArticleMapper;
-import com.intimetec.newsportal.mapper.ReactionMapper;
 import com.intimetec.newsportal.model.Article;
 import com.intimetec.newsportal.model.Category;
-import com.intimetec.newsportal.model.Reaction;
-import com.intimetec.newsportal.model.User;
-import com.intimetec.newsportal.model.enums.ReactionType;
 import com.intimetec.newsportal.repository.ArticleRepository;
+import com.intimetec.newsportal.repository.CategoryRepository;
 import com.intimetec.newsportal.repository.ReactionRepository;
 import com.intimetec.newsportal.repository.UserRepository;
 import com.intimetec.newsportal.service.ArticleService;
-import com.intimetec.newsportal.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -27,13 +23,16 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleRepository articleRepository;
 
     @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private ReactionRepository reactionRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    NewsProviderFactory newsProviderFactory;
 
     @Override
     public List<ArticleDTO> getHeadlineArticles(HeadlineRequestDTO headlineRequestDTO){
@@ -61,14 +60,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<Article> saveArticles(List<ArticleDTO> articleDTOList){
+    public void saveArticles(List<ArticleDTO> articleDTOList){
 
-        Set<String> allCategoryNames = extractAllCategoryNames(articleDTOList);
-        Map<String,Category> categoryNameToCategoryMap = buildCategoryMap(allCategoryNames);
+        List<String> allCategoryNames = extractAllCategoryNames(articleDTOList);
+        List<Category> categoryList = ensureCategoriesExist(allCategoryNames);
+
+        Map<String,Category> categoryNameToCategoryMap = buildCategoryNameToCategoryMap(categoryList);
         List<Article> articleList = constructArticleEntities(articleDTOList, categoryNameToCategoryMap);
-        List<Article> savedArticlesList =  articleRepository.saveAll(articleList);
-
-        return savedArticlesList;
+        articleRepository.saveAll(articleList);
     }
 
     @Override
@@ -78,23 +77,54 @@ public class ArticleServiceImpl implements ArticleService {
         return articleDTOList;
     }
 
-    private Set<String> extractAllCategoryNames(List<ArticleDTO> articleDTOList){
-        Set<String> categoryNames = new HashSet<>();
+    private List<String> extractAllCategoryNames(List<ArticleDTO> articleDTOList){
+        List<String> categoryNames = new ArrayList<>();
         for(ArticleDTO articleDTO : articleDTOList){
-            categoryNames.addAll(articleDTO.getCategories());
+            for(String categoryName : articleDTO.getCategories()){
+                if(!categoryNames.contains(categoryName)){
+                    categoryNames.add(categoryName);
+                }
+            }
         }
         return categoryNames;
     }
 
-    private Map<String, Category> buildCategoryMap(Set<String> categoryNames) {
-        List<Category> categoryList = categoryService.ensureCategoriesExist(new ArrayList<>(categoryNames));
-        Map<String, Category> categoryNameToCategoryMap = new HashMap<>();
+    private Map<String, Category> buildCategoryNameToCategoryMap(List<Category> categoryList) {
 
+        Map<String, Category> categoryNameToCategoryMap = new HashMap<>();
         for(Category category : categoryList){
             categoryNameToCategoryMap.put(category.getCategoryName(),category);
         }
-
         return categoryNameToCategoryMap;
+    }
+
+    private List<Category> ensureCategoriesExist(List<String> categoryNameList){
+
+        List<Category> unsavedCategories = new ArrayList<>();
+
+        List<Category> existingCategories = categoryRepository.findByCategoryNameIn(categoryNameList);
+        Set<String> existingNames = new HashSet<>();
+        for (Category category : existingCategories) {
+            existingNames.add(category.getCategoryName().toLowerCase());
+        }
+
+        System.out.println("##### Existing categories :  "+existingNames);
+
+        for(String categoryName : categoryNameList){
+            if(existingNames!=null && !existingNames.contains(categoryName.toLowerCase())){
+                Category category = new Category();
+                category.setCategoryName(categoryName);
+                unsavedCategories.add(category);
+            }
+        }
+
+        System.out.println(unsavedCategories);
+
+        List<Category> savedCategories = categoryRepository.saveAll(unsavedCategories);
+        List<Category> allCategories = new ArrayList<>();
+        allCategories.addAll(savedCategories);
+        allCategories.addAll(existingCategories);
+        return allCategories;
     }
 
     private List<Article> constructArticleEntities( List<ArticleDTO> articleDTOList, Map<String,Category> categoryMap){
@@ -111,5 +141,34 @@ public class ArticleServiceImpl implements ArticleService {
             articleList.add(article);
         }
         return articleList;
+    }
+
+    @Override
+    public void hidArticle(Integer articleId){
+        Article article = articleRepository.getReferenceById(articleId);
+        article.setVisible(false);
+        articleRepository.save(article);
+    }
+
+    public void hideArticleByCategory(Integer categoryId){
+        List<Article> articleList = articleRepository.findVisibleArticlesByCategoryId(categoryId);
+
+        for(Article article : articleList){
+            article.setVisible(false);
+        }
+        articleRepository.saveAll(articleList);
+    }
+
+    public List<ArticleDTO> fetchArticleFromExternalSources(){
+
+        List<NewsClient> newsClientList = newsProviderFactory.getAvailableNewsClients();
+        List<ArticleDTO> fetchedArticleDTOList = new ArrayList<>();
+        for(NewsClient newsClient : newsClientList){
+            List<ArticleDTO> articleDTOList = newsClient.getArticlesPeriodically();
+            if(articleDTOList != null){
+                fetchedArticleDTOList.addAll(articleDTOList);
+            }
+        }
+        return fetchedArticleDTOList;
     }
 }

@@ -5,10 +5,13 @@ import com.intimetec.newsportal.model.ReportedArticle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ReportedArticleRepository extends JpaRepository<ReportedArticle, Long> {
 
-    int countByArticle(Article article);
+    int countByArticleId(Integer articleId);
+    List<ReportedArticle> findByArticleIdIn(List<Integer> articleIds);
 
 }
 

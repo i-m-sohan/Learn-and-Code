@@ -66,4 +66,10 @@ public class ExternalNewsSourceServiceImpl implements ExternalNewsSourceService 
         ExternalNewsSource externalNewsSource = externalNewsSourceMapper.toEntity(externalNewsSourceDTO);
         externalNewsSourceRepository.save(externalNewsSource);
     }
+
+    public List<ExternalNewsSourceDTO> getAllAvailableExternalNewsSources(){
+        List<ExternalNewsSource> externalNewsSourceList =  externalNewsSourceRepository.findByStatusTrue();
+        List<ExternalNewsSourceDTO> externalNewsSourceDTOList = ExternalNewsSourceMapper.toExternalNewsSourceDTOList(externalNewsSourceList);
+        return externalNewsSourceDTOList;
+    }
 }

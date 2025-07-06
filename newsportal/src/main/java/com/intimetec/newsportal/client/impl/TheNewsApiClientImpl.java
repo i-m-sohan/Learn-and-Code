@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component("theNewsApiClient")
+@Component("The News API")
 public class TheNewsApiClientImpl implements NewsClient {
 
     public String baseUrl;
@@ -40,9 +40,26 @@ public class TheNewsApiClientImpl implements NewsClient {
             queryParameter.put("api_token",apiKey);
             queryParameter.put("language","en");
             HttpResponse<String> jsonResponse =  ApiUtilis.get(baseUrl,queryParameter);
-            System.out.println(jsonResponse);
+//            System.out.println(jsonResponse);
             TheNewsApiResponseDTO theNewsApiResponseDTO = objectMapper.readValue(jsonResponse.body(), TheNewsApiResponseDTO.class);
             List<ArticleDTO> articleDTOList = getUnifiedArticleDTO(theNewsApiResponseDTO);
+
+            System.out.println("Printing Response from server : The News Api");
+            for (ArticleDTO articleDTO : articleDTOList) {
+                System.out.println("-----------------------------------------------------------------------");
+                System.out.println("articleId       = " + articleDTO.getArticleId());
+                System.out.println("title           = " + articleDTO.getTitle());
+                System.out.println("description     = " + articleDTO.getDescription());
+                System.out.println("content         = " + articleDTO.getContent());
+                System.out.println("source          = " + articleDTO.getSource());
+                System.out.println("url             = " + articleDTO.getUrl());
+                System.out.println("publishedDate   = " + articleDTO.getPublishedDate());
+                System.out.println("likesCount      = " + articleDTO.getLikesCount());
+                System.out.println("dislikesCount   = " + articleDTO.getDislikesCount());
+                System.out.println("categories      = " + articleDTO.getCategories());
+                System.out.println("-----------------------------------------------------------------------");
+            }
+
             return articleDTOList;
         }
         catch(Exception exception){

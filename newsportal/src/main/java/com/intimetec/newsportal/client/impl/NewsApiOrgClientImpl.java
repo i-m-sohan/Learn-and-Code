@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@Component("newsApiClient")
+@Component("news api")
 public class NewsApiOrgClientImpl implements NewsClient {
 
     public String baseUrl;
@@ -29,15 +29,30 @@ public class NewsApiOrgClientImpl implements NewsClient {
     public List<ArticleDTO> getArticlesPeriodically() {
         try {
             baseUrl += "/everything";
-            System.out.println("Fetching from: " + baseUrl);
+//            System.out.println("Fetching from: " + baseUrl);
             Map<String,String> queryParameter = new HashMap<>();
             queryParameter.put("q","bitcoin");
             queryParameter.put("apiKey",apiKey);
             HttpResponse<String> jsonResponse =  ApiUtilis.get(baseUrl,queryParameter);
-            System.out.println("printing repsonse : ");
-            System.out.println(jsonResponse);
+//            System.out.println("printing repsonse : ");
+//            System.out.println(jsonResponse);
             NewsApiResponseDTO newsApiResponseDTO = objectMapper.readValue(jsonResponse.body(), NewsApiResponseDTO.class);
             List<ArticleDTO> articleDTOList = getUnifiedArticleDTO(newsApiResponseDTO);
+            System.out.println("Printing Response from server : Newsss Api");
+            for (ArticleDTO articleDTO : articleDTOList) {
+                System.out.println("-----------------------------------------------------------------------");
+                System.out.println("articleId       = " + articleDTO.getArticleId());
+                System.out.println("title           = " + articleDTO.getTitle());
+                System.out.println("description     = " + articleDTO.getDescription());
+                System.out.println("content         = " + articleDTO.getContent());
+                System.out.println("source          = " + articleDTO.getSource());
+                System.out.println("url             = " + articleDTO.getUrl());
+                System.out.println("publishedDate   = " + articleDTO.getPublishedDate());
+                System.out.println("likesCount      = " + articleDTO.getLikesCount());
+                System.out.println("dislikesCount   = " + articleDTO.getDislikesCount());
+                System.out.println("categories      = " + articleDTO.getCategories());
+                System.out.println("-----------------------------------------------------------------------");
+            }
             return articleDTOList;
         }
         catch(Exception exception){
@@ -76,7 +91,6 @@ public class NewsApiOrgClientImpl implements NewsClient {
             } catch (Exception e) {
                 articleDTO.setPublishedDate(null);
             }
-            articleDTO.setCategories(List.of("General"));
             articleDTOList.add(articleDTO);
         }
         return articleDTOList;

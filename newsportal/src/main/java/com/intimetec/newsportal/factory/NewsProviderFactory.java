@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +27,8 @@ public class NewsProviderFactory {
 
     @Autowired
     public NewsProviderFactory(
-            @Qualifier("newsApiClient") NewsClient newsApiClient,
-            @Qualifier("theNewsApiClient") NewsClient theNewsApiClient
+            @Qualifier("news api") NewsClient newsApiClient,
+            @Qualifier("The News API") NewsClient theNewsApiClient
     ) {
         clientMap = new HashMap<>();
         clientMap.put("news api", newsApiClient);           // key as sourceName
@@ -35,12 +36,10 @@ public class NewsProviderFactory {
     }
 
     public NewsClient getClientBySource(String sourceName) {
-        NewsClient client = clientMap.get(sourceName.toLowerCase());
+        NewsClient client = clientMap.get(sourceName);
         if (client == null) throw new IllegalArgumentException("Unsupported source: " + sourceName);
         return client;
     }
-
-
 
     public NewsClient getBestNewsApiClient(){
         List<ExternalNewsSourceDTO> externalNewsSourceDTOList =  externalNewsSourceService.findAllByOrderByLastAccessedAsc();
@@ -59,6 +58,19 @@ public class NewsProviderFactory {
         newsClient.setBaseUrl(validSource.getBaseUrl());
         newsClient.setApiKey(validSource.getApiKey());
         return newsClient;
+    }
+
+   public List<NewsClient> getAvailableNewsClients(){
+        List<ExternalNewsSourceDTO> externalNewsSourceDTOList = externalNewsSourceService.getAllAvailableExternalNewsSources();
+        List<NewsClient> newsClientList = new ArrayList<>();
+        for(ExternalNewsSourceDTO externalNewsSourceDTO : externalNewsSourceDTOList){
+            NewsClient newsClient = getClientBySource(externalNewsSourceDTO.getSourceName());
+            newsClient.setApiKey(externalNewsSourceDTO.getApiKey());
+            newsClient.setBaseUrl(externalNewsSourceDTO.getBaseUrl());
+            newsClientList.add(newsClient);
+        }
+
+        return newsClientList;
     }
 }
 

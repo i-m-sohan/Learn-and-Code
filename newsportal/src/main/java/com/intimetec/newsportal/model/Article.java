@@ -29,9 +29,17 @@ public class Article {
 
     private LocalDateTime publishedDate;
 
-    private Integer likesCount = 0;
+    @Column(nullable = false)
+    private Integer likesCount;
 
-    private Integer dislikesCount = 0;
+    @Column(nullable = false)
+    private Integer dislikesCount;
+
+    @Column(nullable = false)
+    private Integer reportCount;
+
+    @Column(nullable = false)
+    private boolean isVisible;
 
     @ManyToMany
     @JoinTable(
@@ -43,10 +51,14 @@ public class Article {
 
     public Article() {
         categories = new HashSet<>();
+        this.likesCount = 0;
+        this.dislikesCount = 0;
+        this.reportCount = 0;
+        this.isVisible = true;
     }
 
     public Article(Integer articleId, String title, String description, String content, String source, String url,
-                   LocalDateTime publishedDate, Integer likesCount, Integer dislikesCount) {
+                   LocalDateTime publishedDate, Integer likesCount, Integer dislikesCount, Integer reportCount, Boolean isVisible) {
         this.articleId = articleId;
         this.title = title;
         this.description = description;
@@ -54,8 +66,11 @@ public class Article {
         this.source = source;
         this.url = url;
         this.publishedDate = publishedDate;
-        this.likesCount = likesCount;
-        this.dislikesCount = dislikesCount;
+        this.likesCount = likesCount != null ? likesCount : 0;
+        this.dislikesCount = dislikesCount != null ? dislikesCount : 0;
+        this.reportCount = reportCount != null ? reportCount : 0;
+        this.isVisible = isVisible != null ? isVisible : true;
+        this.categories = new HashSet<>();
     }
 
     public Integer getArticleId() { return articleId; }
@@ -87,6 +102,22 @@ public class Article {
 
     public Set<Category> getCategories() { return categories; }
     public void setCategories(Set<Category> categories) { this.categories = categories; }
+
+    public Integer getReportCount() {
+        return reportCount;
+    }
+
+    public void setReportCount(Integer reportCount) {
+        this.reportCount = reportCount;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
 
     @Override
     public String toString() {

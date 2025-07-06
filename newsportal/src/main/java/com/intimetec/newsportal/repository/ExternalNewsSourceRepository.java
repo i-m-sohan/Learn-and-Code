@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ExternalNewsSourceRepository extends JpaRepository<ExternalNewsSource,Long> {
     List<ExternalNewsSource> findAllByOrderByLastAccessedAsc();
+    List<ExternalNewsSource> findByStatusTrue();
 }

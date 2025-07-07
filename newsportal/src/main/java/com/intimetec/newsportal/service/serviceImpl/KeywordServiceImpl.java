@@ -1,6 +1,7 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
 import com.intimetec.newsportal.dto.CategoryKeywordDTO;
+import com.intimetec.newsportal.exception.EntityNotFoundException;
 import com.intimetec.newsportal.model.*;
 import com.intimetec.newsportal.repository.*;
 import com.intimetec.newsportal.service.CategoryService;
@@ -40,6 +41,11 @@ public class KeywordServiceImpl implements KeywordService {
         System.out.println("Inside service method");
         User user = userRepository.getReferenceById(userId);
         Category category = categoryRepository.findByCategoryName(categoryKeywordDTO.getCategoryName());
+
+        if(category==null){
+            System.out.println("Category is null");
+            throw new EntityNotFoundException("Category : " + categoryKeywordDTO.getCategoryName() + " Not found!");
+        }
 
         List<String> keywordNames = categoryKeywordDTO.getKeywords();
         List<Keyword> existingKeywords = keywordRepository.findByKeywordIn(keywordNames);
@@ -92,6 +98,10 @@ public class KeywordServiceImpl implements KeywordService {
     public void removeUserCategoryKeyword(Long userId, CategoryKeywordDTO categoryKeywordDTO){
         User user = userRepository.getReferenceById(userId);
         Category category = categoryRepository.findByCategoryName(categoryKeywordDTO.getCategoryName());
+
+        if(category == null){
+            throw new EntityNotFoundException("Category : " + categoryKeywordDTO.getCategoryName() + " Not found!");
+        }
 
         List<String> keywordNames = categoryKeywordDTO.getKeywords();
         List<Keyword> keywords = keywordRepository.findByKeywordIn(keywordNames);

@@ -1,6 +1,6 @@
 package com.intimetec.newsportal.mapper;
 
-import com.intimetec.newsportal.dto.ArticleFlagRequestDTO;
+import com.intimetec.newsportal.dto.ArticleReportRequestDTO;
 import com.intimetec.newsportal.dto.ReportedArticleDTO;
 import com.intimetec.newsportal.model.ReportedArticle;
 
@@ -10,16 +10,16 @@ import java.util.stream.Collectors;
 
 public class ReportedArticleMapper {
 
-    public static ReportedArticle toEntity(ArticleFlagRequestDTO articleFlagRequestDTO) {
+    public static ReportedArticle toEntity(ArticleReportRequestDTO articleReportRequestDTO) {
         return new ReportedArticle(
-                articleFlagRequestDTO.getUserId(),
-                articleFlagRequestDTO.getArticleId(),
-                articleFlagRequestDTO.getReason()
+                articleReportRequestDTO.getUserId(),
+                articleReportRequestDTO.getArticleId(),
+                articleReportRequestDTO.getReason()
         );
     }
 
-    public static List<ReportedArticle> toEntityList(List<ArticleFlagRequestDTO> articleFlagRequestDTOS) {
-        return articleFlagRequestDTOS.stream()
+    public static List<ReportedArticle> toEntityList(List<ArticleReportRequestDTO> articleReportRequestDTOS) {
+        return articleReportRequestDTOS.stream()
                 .map(ReportedArticleMapper::toEntity)
                 .collect(Collectors.toList());
     }

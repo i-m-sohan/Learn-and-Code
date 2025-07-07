@@ -9,6 +9,7 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class AuthExceptionHandler {
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<?> handleBadCredentialException(UserNotFoundException userNotFoundException){
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

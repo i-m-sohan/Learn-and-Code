@@ -9,7 +9,7 @@ import com.intimetec.newsportal.model.Article;
 import java.util.List;
 
 public interface ArticleService {
-    public void saveArticles(List<ArticleDTO> articleDTOList);
+    public List<Article> saveArticles(List<ArticleDTO> articleDTOList);
     public List<ArticleDTO> getHeadlineArticles(HeadlineRequestDTO headlineRequestDTO);
     public List<ArticleDTO> searchArticles(String keyword);
     public void hidArticle(Integer articleId);

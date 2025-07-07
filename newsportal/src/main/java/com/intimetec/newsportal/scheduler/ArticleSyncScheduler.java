@@ -22,15 +22,6 @@ import java.util.*;
 public class ArticleSyncScheduler {
 
     @Autowired
-    private NewsProviderFactory newsProviderFactory;
-
-    @Autowired
-    private ArticleRepository articleRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
     private CategoryService categoryService;
 
     @Autowired
@@ -46,14 +37,13 @@ public class ArticleSyncScheduler {
     public void fetchArticle() {
         List<ArticleDTO> articleDTOList = articleService.fetchArticleFromExternalSources();
         categoryService.defineArticlesCategory(articleDTOList);
-        articleService.saveArticles(articleDTOList);
-//        for(ArticleDTO articleDTO : articleDTOList){
-//            System.out.println("-----------------------------------------------------------------------");
-//            System.out.println(articleDTO.toString());
-//            System.out.println("-----------------------------------------------------------------------");
-//        }
+        List<Article> articleList = articleService.saveArticles(articleDTOList);
 
-//        List<Article> articleList =  articleService.saveArticles(articleDTOList);
-        notificationService.notifyUsersForMatchingArticles(articleDTOList);
+        List<ArticleDTO> articleDTOSavedList = new ArrayList<>();
+        for(Article article : articleList){
+            ArticleDTO articleDTO = ArticleMapper.toDTO(article,new ArrayList<>(article.getCategories()));
+            articleDTOSavedList.add(articleDTO);
+        }
+        notificationService.notifyUsersForMatchingArticles(articleDTOSavedList);
     }
 }

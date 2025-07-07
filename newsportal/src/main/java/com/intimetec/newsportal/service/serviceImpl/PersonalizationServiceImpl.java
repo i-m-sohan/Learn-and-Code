@@ -35,33 +35,65 @@ public class PersonalizationServiceImpl implements PersonalizationService {
 
     @Override
     public List<ArticleDTO> getPersonalizedArticles(Long userId, List<ArticleDTO> articleDTOList){
-        computeRelevance(userId,articleDTOList);
-        return null;
+        Map<Integer,Long> articleToRelevanceScoreMap = computeRelevance(userId,articleDTOList);
+        List<ArticleDTO> filteredArticles = new ArrayList<>();
+        for (ArticleDTO article : articleDTOList) {
+            if (articleToRelevanceScoreMap.containsKey(article.getArticleId())) {
+                filteredArticles.add(article);
+            }
+        }
+
+        Collections.sort(filteredArticles, new Comparator<ArticleDTO>() {
+            @Override
+            public int compare(ArticleDTO a1, ArticleDTO a2) {
+                Long score1 = articleToRelevanceScoreMap.get(a1.getArticleId());
+                Long score2 = articleToRelevanceScoreMap.get(a2.getArticleId());
+                return score2.compareTo(score1);
+            }
+        });
+
+        return filteredArticles;
     }
 
-    private Map<ArticleDTO,Long> computeRelevance(Long userId, List<ArticleDTO> articleDTOList){
-        Map<ArticleDTO,Long> articleToRelevanceScoreMap = new HashMap<>();
+    private Map<Integer,Long> computeRelevance(Long userId, List<ArticleDTO> articleDTOList){
+        Map<Integer,Long> articleToRelevanceScoreMap = new HashMap<>();
 
-//        Map<Integer,Long> articleIdToLikeRelevanceMap = computeLikeContribution(userId,articleDTOList);
+        Map<Integer,Long> articleIdToLikeRelevanceMap = computeLikeContribution(userId,articleDTOList);
 //
 //        for(Integer articleId : articleIdToLikeRelevanceMap.keySet()){
 //            System.out.println("Articel Id : " + articleId);
 //            System.out.println("Like Relevance :" + articleIdToLikeRelevanceMap.get(articleId));
 //        }
 //
-//        Map<Integer,Long> articleIdToDisikeRelevanceMap = computeDislikeContribution(userId,articleDTOList);
+        Map<Integer,Long> articleIdToDisikeRelevanceMap = computeDislikeContribution(userId,articleDTOList);
 //        for(Integer articleId : articleIdToDisikeRelevanceMap.keySet()){
 //            System.out.println("Articel Id : " + articleId);
 //            System.out.println("Dislike Relevance :" + articleIdToDisikeRelevanceMap.get(articleId));
 //        }
 
         Map<Integer,Long> articleIdToReportRelevanceMap = computeReportContribution(userId,articleDTOList);
-        for(Integer articleId : articleIdToReportRelevanceMap.keySet()){
-            System.out.println("Articel Id : " + articleId);
-            System.out.println("Report Relevance :" + articleIdToReportRelevanceMap.get(articleId));
-        }
+//        for(Integer articleId : articleIdToReportRelevanceMap.keySet()){
+//            System.out.println("Articel Id : " + articleId);
+//            System.out.println("Report Relevance :" + articleIdToReportRelevanceMap.get(articleId));
+//        }
 
-        return null;
+        for(ArticleDTO articleDTO : articleDTOList){
+            Integer articleId = articleDTO.getArticleId();
+            Long likeComputance = 0L;
+            Long dislikeComputane = 0L;
+            Long reportedComputance = 0L;
+            if(articleIdToLikeRelevanceMap.containsKey(articleId)){
+                likeComputance += articleIdToLikeRelevanceMap.get(articleId);
+            }
+            if(articleIdToDisikeRelevanceMap.containsKey(articleId)){
+                dislikeComputane += articleIdToDisikeRelevanceMap.get(articleId);
+            }
+            if(articleIdToReportRelevanceMap.containsKey(articleId)){
+                reportedComputance += articleIdToReportRelevanceMap.get(articleId);
+            }
+            articleToRelevanceScoreMap.put(articleId, articleToRelevanceScoreMap.getOrDefault(articleId,0L) + likeComputance+dislikeComputane+reportedComputance);
+        }
+        return articleToRelevanceScoreMap;
     }
 
     Map<Integer,Long> computeLikeContribution(Long userId, List<ArticleDTO> articleDTOList){

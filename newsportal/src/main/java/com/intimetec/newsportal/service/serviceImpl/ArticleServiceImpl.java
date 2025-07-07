@@ -3,16 +3,18 @@ package com.intimetec.newsportal.service.serviceImpl;
 import com.intimetec.newsportal.client.NewsClient;
 import com.intimetec.newsportal.dto.ArticleDTO;
 import com.intimetec.newsportal.dto.HeadlineRequestDTO;
+import com.intimetec.newsportal.exception.EntityFetchException;
+import com.intimetec.newsportal.exception.CategoryException;
+import com.intimetec.newsportal.exception.EntitySaveException;
 import com.intimetec.newsportal.factory.NewsProviderFactory;
 import com.intimetec.newsportal.mapper.ArticleMapper;
 import com.intimetec.newsportal.model.Article;
+import com.intimetec.newsportal.model.ArticleCategory;
 import com.intimetec.newsportal.model.Category;
-import com.intimetec.newsportal.repository.ArticleRepository;
-import com.intimetec.newsportal.repository.CategoryRepository;
-import com.intimetec.newsportal.repository.ReactionRepository;
-import com.intimetec.newsportal.repository.UserRepository;
+import com.intimetec.newsportal.repository.*;
 import com.intimetec.newsportal.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,57 +34,152 @@ public class ArticleServiceImpl implements ArticleService {
     private CategoryRepository categoryRepository;
 
     @Autowired
+    private ArticleCategoryRepository articleCategoryRepository;
+
+    @Autowired
     NewsProviderFactory newsProviderFactory;
 
     @Override
     public List<ArticleDTO> getHeadlineArticles(HeadlineRequestDTO headlineRequestDTO){
-        List<Article> articleList =  articleRepository.findByPublishedDateBetweenAndIsVisibleTrue(headlineRequestDTO.getStartDate(),headlineRequestDTO.getEndDate());
+        System.out.println(" Start Date: " + headlineRequestDTO.getStartDate());
+        System.out.println(" End Date: " + headlineRequestDTO.getEndDate());
 
-        List<Article> finalisedArticleList = new ArrayList<>();
+        List<Article> articleList = new ArrayList<>();
+
+        try{
+            articleList = articleRepository.findByPublishedDateBetweenAndIsVisibleTrue(
+                    headlineRequestDTO.getStartDate(), headlineRequestDTO.getEndDate());
+        }
+        catch (Exception exception) {
+            String message = "Article fetch failed for start date : " + headlineRequestDTO.getStartDate() + "End Date : "+ headlineRequestDTO.getEndDate() + "and Visible articles";
+            throw new EntityFetchException(message, exception);
+        }
+
+        System.out.println(" Articles fetched from DB: " + articleList.size());
+
+        List<Integer> articleIds = new ArrayList<>();
+        for (Article article : articleList) {
+            if (!articleIds.contains(article.getArticleId())) {
+                articleIds.add(article.getArticleId());
+            }
+        }
+        System.out.println(" Article IDs: " + articleIds);
+
+        List<ArticleCategory> articleCategoryList = new ArrayList<>();
+        try {
+            articleCategoryList = articleCategoryRepository.findByArticleIdIn(articleIds);
+        } catch (Exception exception) {
+            String message = "Failed to fetch ArticleCategory list for Article IDs: " + articleIds;
+            throw new EntityFetchException(message, exception);
+        }
+
+        System.out.println(" ArticleCategory entries fetched: " + articleCategoryList.size());
+
+        List<Integer> categoryIds = new ArrayList<>();
+        for (ArticleCategory articleCategory : articleCategoryList) {
+            if (!categoryIds.contains(articleCategory.getCategoryId())) {
+                categoryIds.add(articleCategory.getCategoryId());
+            }
+        }
+        System.out.println(" Category IDs: " + categoryIds);
+
+        List<Category> categoryList = new ArrayList<>();
+        try {
+            categoryList = categoryRepository.findAllById(categoryIds);
+        } catch (Exception exception) {
+            String message = "Failed to fetch categories for category IDs: " + categoryIds;
+            throw new EntityFetchException(message);
+        }
+
+        System.out.println(" Categories fetched: " + categoryList.size());
+
+        Map<Integer, Category> idToCategoryMap = new HashMap<>();
+        for (Category category : categoryList) {
+            if (!idToCategoryMap.containsKey(category.getCategoryId())) {
+                idToCategoryMap.put(category.getCategoryId(), category);
+            }
+        }
+
+        Map<Integer, List<String>> articleIdToCategoryMap = new HashMap<>();
+        for (ArticleCategory articleCategory : articleCategoryList) {
+            Integer articleId = articleCategory.getArticleId();
+            Integer categoryId = articleCategory.getCategoryId();
+
+            if (!articleIdToCategoryMap.containsKey(articleId)) {
+                articleIdToCategoryMap.put(articleId, new ArrayList<>());
+            }
+            List<String> categories = articleIdToCategoryMap.get(articleId);
+            Category category = idToCategoryMap.get(categoryId);
+            if (category != null && !categories.contains(category.getCategoryName())) {
+                categories.add(category.getCategoryName());
+            }
+        }
+        System.out.println(" Article ID to Category Map: " + articleIdToCategoryMap);
+
+        List<ArticleDTO> articleDTOList = ArticleMapper.toDTOList(articleList);
+        for (ArticleDTO articleDTO : articleDTOList) {
+            articleDTO.setCategories(articleIdToCategoryMap.get(articleDTO.getArticleId()));
+        }
+
         String categoryName = headlineRequestDTO.getCategory();
+        System.out.println(" Requested category: " + categoryName);
 
-        if(!"All".equalsIgnoreCase(categoryName)){
-            if(articleList!=null){
-                for(Article article : articleList){
-                    Set<Category> categorySet = article.getCategories();
-                    for(Category category : categorySet){
-                        if(category.getCategoryName().equalsIgnoreCase(categoryName)){
-                            break;
-                        }
+        if (categoryName == "All") {
+            System.out.println(" Returning all articles (no filtering)");
+            return articleDTOList;
+        }
+
+        List<ArticleDTO> finalisedArticleList = new ArrayList<>();
+        for (ArticleDTO articleDTO : articleDTOList) {
+            System.out.println(" Checking article: " + articleDTO.getArticleId());
+            List<String> categories = articleDTO.getCategories();
+            System.out.println(" Categories of article: " + categories);
+            if (categories != null) {
+                for (String category : categories) {
+                    if (categoryName.equalsIgnoreCase(category)) {
+                        finalisedArticleList.add(articleDTO);
+                        break;
                     }
-                    finalisedArticleList.add(article);
                 }
             }
         }
 
-        List<ArticleDTO> articleDTOList = ArticleMapper.toDTOList(finalisedArticleList);
-        return articleDTOList;
+        System.out.println(" Final article list size: " + finalisedArticleList.size());
+        return finalisedArticleList;
     }
 
     @Override
-    public void saveArticles(List<ArticleDTO> articleDTOList){
-
+    public List<Article> saveArticles(List<ArticleDTO> articleDTOList){
+        System.out.println(" Saving articles...");
         List<String> allCategoryNames = extractAllCategoryNames(articleDTOList);
-        System.out.println("##### All Category Names : ");
-        System.out.println(allCategoryNames);
+        System.out.println(" All Category Names: " + allCategoryNames);
 
         List<Category> categoryList = ensureCategoriesExist(allCategoryNames);
         for(Category category : categoryList){
-            System.out.println(category.getCategoryName());
-            System.out.println(category.isVisible());
+            System.out.println(" Category: " + category.getCategoryName() + ", Visible: " + category.isVisible());
         }
 
         Map<String,Category> categoryNameToCategoryMap = buildCategoryNameToCategoryMap(categoryList);
-
-        System.out.println(categoryNameToCategoryMap.keySet());
+        System.out.println(" Category Map Keys: " + categoryNameToCategoryMap.keySet());
 
         List<Article> articleList = constructArticleEntities(articleDTOList, categoryNameToCategoryMap);
-        articleRepository.saveAll(articleList);
+        System.out.println(" Articles to save: " + articleList.size());
+        List<Article> articles = new ArrayList<>();
+        try{
+            articles = articleRepository.saveAll(articleList);
+        }
+        catch(DataAccessException dataAccessException){
+            String message = "Failed to save articles. Total articles attempted: " + articleList.size();
+            throw new EntitySaveException(message, dataAccessException);
+        }
+        return articles;
     }
 
     @Override
     public List<ArticleDTO> searchArticles(String keyword) {
+        System.out.println(" Searching articles for keyword: " + keyword);
         List<Article> articles = articleRepository.searchByKeyword(keyword);
+        System.out.println(" Articles matched: " + articles.size());
         List<ArticleDTO> articleDTOList = ArticleMapper.toDTOList(articles);
         return articleDTOList;
     }
@@ -100,7 +197,6 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private Map<String, Category> buildCategoryNameToCategoryMap(List<Category> categoryList) {
-
         Map<String, Category> categoryNameToCategoryMap = new HashMap<>();
         for(Category category : categoryList){
             categoryNameToCategoryMap.put(category.getCategoryName().toLowerCase(),category);
@@ -109,7 +205,6 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private List<Category> ensureCategoriesExist(List<String> categoryNameList){
-
         List<Category> unsavedCategories = new ArrayList<>();
 
         List<Category> existingCategories = categoryRepository.findByCategoryNameIn(categoryNameList);
@@ -118,7 +213,7 @@ public class ArticleServiceImpl implements ArticleService {
             existingNames.add(category.getCategoryName().toLowerCase());
         }
 
-        System.out.println("##### Existing categories :  "+existingNames);
+        System.out.println(" Existing categories: " + existingNames);
 
         for(String categoryName : categoryNameList){
             if(existingNames!=null && !existingNames.contains(categoryName.toLowerCase())){
@@ -128,7 +223,7 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }
 
-        System.out.println(unsavedCategories);
+        System.out.println(" Unsaved categories: " + unsavedCategories);
 
         List<Category> savedCategories = categoryRepository.saveAll(unsavedCategories);
         List<Category> allCategories = new ArrayList<>();
@@ -146,10 +241,10 @@ public class ArticleServiceImpl implements ArticleService {
             List<String> categoryNames = articleDTO.getCategories();
             Boolean isVisible = true;
 
-            System.out.println("Inside the consturctiion of entieies now : ");
+            System.out.println(" Constructing article entity: " + articleDTO.getArticleId());
             for(String categoryName : categoryNames){
                 Category category = categoryMap.get(categoryName);
-                System.out.println(categoryName);
+                System.out.println(" Handling category: " + categoryName);
 
                 if(category != null && !category.isVisible()){
                     isVisible = false;
@@ -166,12 +261,14 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void hidArticle(Integer articleId){
+        System.out.println(" Hiding article ID: " + articleId);
         Article article = articleRepository.getReferenceById(articleId);
         article.setVisible(false);
         articleRepository.save(article);
     }
 
     public void hideArticleByCategory(Integer categoryId){
+        System.out.println(" Hiding articles by category ID: " + categoryId);
         List<Article> articleList = articleRepository.findVisibleArticlesByCategoryId(categoryId);
 
         for(Article article : articleList){
@@ -181,12 +278,13 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     public List<ArticleDTO> fetchArticleFromExternalSources(){
-
+        System.out.println(" Fetching articles from external sources...");
         List<NewsClient> newsClientList = newsProviderFactory.getAvailableNewsClients();
         List<ArticleDTO> fetchedArticleDTOList = new ArrayList<>();
         for(NewsClient newsClient : newsClientList){
             List<ArticleDTO> articleDTOList = newsClient.getArticlesPeriodically();
             if(articleDTOList != null){
+                System.out.println(" Articles fetched from client: " + articleDTOList.size());
                 fetchedArticleDTOList.addAll(articleDTOList);
             }
         }

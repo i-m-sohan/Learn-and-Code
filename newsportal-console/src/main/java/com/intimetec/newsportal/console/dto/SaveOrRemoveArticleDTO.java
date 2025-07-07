@@ -1,9 +1,8 @@
-package com.intimetec.newsportal.dto;
+package com.intimetec.newsportal.console.dto;
 
-public class ArticleFlagRequestDTO {
+public class SaveOrRemoveArticleDTO{
     private Long userId;
     private Integer articleId;
-    private String reason;
 
     public Long getUserId() {
         return userId;
@@ -19,13 +18,5 @@ public class ArticleFlagRequestDTO {
 
     public void setArticleId(Integer articleId) {
         this.articleId = articleId;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
     }
 }

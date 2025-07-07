@@ -11,4 +11,5 @@ public interface CategoryRepository extends JpaRepository<Category,Integer> {
     public Category findByCategoryName(String categoryName);
     List<Category> findByCategoryNameInAndIsVisibleTrue(Collection<String> categoryNames);
     Category findByCategoryNameAndIsVisibleTrue(String categoryName);
+    List<Category> findByIsVisibleTrue();
 }

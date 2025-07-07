@@ -14,4 +14,11 @@ public class UserSession {
     public static void clear() {
         userId = null;
     }
+
+    public static boolean isSessionRunning(){
+        if(userId==null){
+            return false;
+        }
+        return true;
+    }
 }

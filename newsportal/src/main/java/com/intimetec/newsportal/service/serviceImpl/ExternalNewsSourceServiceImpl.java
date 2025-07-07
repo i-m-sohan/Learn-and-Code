@@ -67,6 +67,7 @@ public class ExternalNewsSourceServiceImpl implements ExternalNewsSourceService 
         externalNewsSourceRepository.save(externalNewsSource);
     }
 
+    @Override
     public List<ExternalNewsSourceDTO> getAllAvailableExternalNewsSources(){
         List<ExternalNewsSource> externalNewsSourceList =  externalNewsSourceRepository.findByStatusTrue();
         List<ExternalNewsSourceDTO> externalNewsSourceDTOList = ExternalNewsSourceMapper.toExternalNewsSourceDTOList(externalNewsSourceList);

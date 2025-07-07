@@ -11,4 +11,6 @@ public interface NotificationService {
     public void notifyUsersForMatchingArticles(List<ArticleDTO> articleDTOList);
     public void updateUserCategoryPreference(Long userId, CategoryNotificationPreferenceDTO categoryNotificationPreferenceDTO);
     public List<NotificationDTO> getUserNotifications(Long userId);
+    public List<CategoryNotificationPreferenceDTO> getUserCategoryPreferences(Long userId);
+    public void createCategoryNotificationPreferences(Long userId);
 }

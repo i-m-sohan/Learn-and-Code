@@ -2,8 +2,10 @@ package com.intimetec.newsportal.controller;
 
 import com.intimetec.newsportal.dto.LoginRequestDTO;
 import com.intimetec.newsportal.dto.SignUpRequestDTO;
+import com.intimetec.newsportal.model.Notification;
 import com.intimetec.newsportal.model.User;
 import com.intimetec.newsportal.service.AuthService;
+import com.intimetec.newsportal.service.NotificationService;
 import com.intimetec.newsportal.service.UserService;
 import org.aspectj.lang.annotation.DeclareError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,18 +27,27 @@ public class AuthController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    NotificationService notificationService;
+
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignUpRequestDTO signUpRequestDTO){
         authService.registerUser(signUpRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "User registered successfully"));
+        User user = userService.getUserByUsername(signUpRequestDTO.getUsername());
+        notificationService.createCategoryNotificationPreferences(user.getId());
+        return new ResponseEntity<>(
+                Map.of(
+                        "message", "Signup successful, User Registered",
+                        "role", user.getRole(),
+                        "id",user.getId()
+                ),HttpStatus.CREATED
+        );
 
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO){
         authService.loginUser(loginRequestDTO);
-
         User user = userService.getUserByUsername(loginRequestDTO.getUsername());
 
         return ResponseEntity.ok(

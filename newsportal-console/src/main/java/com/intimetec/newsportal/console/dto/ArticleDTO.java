@@ -1,6 +1,7 @@
 package com.intimetec.newsportal.console.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleDTO {
@@ -13,11 +14,21 @@ public class ArticleDTO {
     private String url;
     private LocalDateTime publishedDate;
     private List<String> categories;
+    private Integer likesCount;
+    private Integer dislikesCount;
+    private Integer reportCount;
+    private Boolean isVisible;
 
-    public ArticleDTO() {}
+    public ArticleDTO() {
+        categories = new ArrayList<>();
+        this.likesCount = 0 ;
+        this.dislikesCount = 0;
+        this.reportCount = 0;
+        this.isVisible = true;
+    }
 
     public ArticleDTO(Integer articleId, String title, String description, String content,
-                      String source, String url, LocalDateTime publishedDate, List<String> categories) {
+                      String source, String url, LocalDateTime publishedDate, List<String> categories,Integer likesCount,Integer dislikesCount,Integer reportCount,Boolean isVisible) {
         this.articleId = articleId;
         this.title = title;
         this.description = description;
@@ -26,6 +37,10 @@ public class ArticleDTO {
         this.url = url;
         this.publishedDate = publishedDate;
         this.categories = categories;
+        this.likesCount = likesCount;
+        this.dislikesCount = dislikesCount;
+        this.reportCount = reportCount;
+        this.isVisible = isVisible;
     }
 
     public Integer getArticleId() {
@@ -86,6 +101,38 @@ public class ArticleDTO {
 
     public List<String> getCategories() {
         return categories;
+    }
+
+    public Integer getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(Integer likesCount) {
+        this.likesCount = likesCount;
+    }
+
+    public Integer getDislikesCount() {
+        return dislikesCount;
+    }
+
+    public void setDislikesCount(Integer dislikesCount) {
+        this.dislikesCount = dislikesCount;
+    }
+
+    public Integer getReportCount() {
+        return reportCount;
+    }
+
+    public void setReportCount(Integer reportCount) {
+        this.reportCount = reportCount;
+    }
+
+    public Boolean getIsVisible() {
+        return isVisible;
+    }
+
+    public void setIsVisible(Boolean visible) {
+        isVisible = visible;
     }
 
     @Override

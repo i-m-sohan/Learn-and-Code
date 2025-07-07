@@ -61,6 +61,7 @@ public class ExternalNewsSourceMapper {
                 : "Never";
 
         return new ExternalServerDetailDTO(
+                entity.getSourceId(),
                 entity.getSourceName(),
                 entity.getApiKey()
         );

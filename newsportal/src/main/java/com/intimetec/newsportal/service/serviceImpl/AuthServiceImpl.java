@@ -40,7 +40,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void loginUser(LoginRequestDTO loginRequestDTO){
         Optional<User> oldUser = userRepository.findByUsername(loginRequestDTO.getUsername());
-
         if(!oldUser.isPresent()){
             throw new UserNotFoundException("User with username : "+ loginRequestDTO.getUsername() +" not found!");
         }

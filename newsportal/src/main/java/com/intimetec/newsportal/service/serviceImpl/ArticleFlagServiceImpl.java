@@ -1,7 +1,7 @@
 package com.intimetec.newsportal.service.serviceImpl;
 
 import com.intimetec.newsportal.dto.ArticleDTO;
-import com.intimetec.newsportal.dto.ArticleFlagRequestDTO;
+import com.intimetec.newsportal.dto.ArticleReportRequestDTO;
 import com.intimetec.newsportal.dto.ReportedArticleDTO;
 import com.intimetec.newsportal.dto.ReportedArticleSummaryDTO;
 import com.intimetec.newsportal.mapper.ArticleMapper;
@@ -12,6 +12,8 @@ import com.intimetec.newsportal.model.ReportedArticle;
 import com.intimetec.newsportal.repository.*;
 import com.intimetec.newsportal.mapper.ReportedArticleMapper;
 import com.intimetec.newsportal.service.ArticleFlagService;
+import com.intimetec.newsportal.service.EmailService;
+import com.intimetec.newsportal.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +37,19 @@ public class ArticleFlagServiceImpl implements ArticleFlagService {
     @Autowired
     ReportedArticleRepository reportedArticleRepository;
 
+    @Autowired
+    EmailService emailService;
+
+    @Autowired
+    NotificationService notificationService;
+
     @Override
-    public void flagArticle(ArticleFlagRequestDTO articleFlagRequestDTO){
-        ReportedArticle reportedArticle = ReportedArticleMapper.toEntity(articleFlagRequestDTO);
+    public void flagArticle(ArticleReportRequestDTO articleReportRequestDTO){
+        ReportedArticle reportedArticle = ReportedArticleMapper.toEntity(articleReportRequestDTO);
 
         reportedArticleRepository.save(reportedArticle);
 
-        Article article = articleRepository.getReferenceById(articleFlagRequestDTO.getArticleId());
+        Article article = articleRepository.getReferenceById(articleReportRequestDTO.getArticleId());
         List<ArticleCategory> articleCategoryList = articleCategoryRepository.findByArticleId(article.getArticleId());
 
         Set<Integer> categoryIds = new HashSet<>();
@@ -67,16 +75,13 @@ public class ArticleFlagServiceImpl implements ArticleFlagService {
 
     @Override
     public List<ReportedArticleSummaryDTO> getReportedArticleSummary() {
-        System.out.println("In service");
-        List<Article> flaggedArticles = articleRepository.findByReportCountGreaterThan(2);
-        System.out.println("flaggedArticles :");
-        System.out.println(flaggedArticles);
+        List<Article> flaggedArticles = articleRepository.findVisibleReportedArticles(0);
         List<ArticleDTO> articleDTOList = ArticleMapper.toDTOList(flaggedArticles);
+
         List<Integer> articleIds = new ArrayList<>();
         for (ArticleDTO articleDTO : articleDTOList) {
             articleIds.add(articleDTO.getArticleId());
         }
-        System.out.println(articleIds);
 
         List<ReportedArticle> allReports = reportedArticleRepository.findByArticleIdIn(articleIds);
         List<ReportedArticleDTO> reportedArticleDTOS = ReportedArticleMapper.toDTOList(allReports);
@@ -84,19 +89,14 @@ public class ArticleFlagServiceImpl implements ArticleFlagService {
         Map<Integer, List<String>> articleIdToReasonsMap = new HashMap<>();
         for (ReportedArticleDTO reportedArticleDTO : reportedArticleDTOS) {
             Integer articleId = reportedArticleDTO.getArticleId();
-            if (!articleIdToReasonsMap.containsKey(articleId)) {
-                articleIdToReasonsMap.put(articleId, new ArrayList<>());
-            }
-            List<String> reasons = articleIdToReasonsMap.get(articleId);
-            if (reportedArticleDTO.getReason() != null && !reasons.contains(reportedArticleDTO.getReason())) {
-                reasons.add(reportedArticleDTO.getReason());
-            }
+            articleIdToReasonsMap
+                    .computeIfAbsent(articleId, k -> new ArrayList<>())
+                    .add(reportedArticleDTO.getReason());
         }
 
         List<ReportedArticleSummaryDTO> reportedArticleSummaryDTOS = new ArrayList<>();
         for (Article article : flaggedArticles) {
             List<String> reasons = articleIdToReasonsMap.getOrDefault(article.getArticleId(), new ArrayList<>());
-
             ReportedArticleSummaryDTO dto = new ReportedArticleSummaryDTO(
                     article.getArticleId(),
                     article.getTitle(),
@@ -105,7 +105,6 @@ public class ArticleFlagServiceImpl implements ArticleFlagService {
                     article.getReportCount(),
                     reasons
             );
-
             reportedArticleSummaryDTOS.add(dto);
         }
 

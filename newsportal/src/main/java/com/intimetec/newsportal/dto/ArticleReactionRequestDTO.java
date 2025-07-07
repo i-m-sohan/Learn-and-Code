@@ -5,6 +5,15 @@ public class ArticleReactionRequestDTO {
     private Integer articleId;
     private String reactionType; // Expected values: "LIKE" or "DISLIKE"
 
+    public ArticleReactionRequestDTO() {
+    }
+
+    public ArticleReactionRequestDTO(Long userId, String reactionType, Integer articleId) {
+        this.userId = userId;
+        this.reactionType = reactionType;
+        this.articleId = articleId;
+    }
+
     public Long getUserId() {
         return userId;
     }

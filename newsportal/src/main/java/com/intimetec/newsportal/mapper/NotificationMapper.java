@@ -17,32 +17,31 @@ public class NotificationMapper {
 
         NotificationDTO dto = new NotificationDTO();
         dto.setNotificationId(notification.getNotificationId());
-        dto.setUserId(notification.getUser().getId());
-        dto.setArticleId(notification.getArticle().getArticleId());
+        dto.setUserId(notification.getUserId());
+        dto.setArticleId(notification.getArticleId());
         dto.setMessage(notification.getMessage());
         dto.setCreatedAt(notification.getCreatedAt());
         return dto;
     }
 
-    public static Notification toEntity(NotificationDTO dto, User user) {
+    public static Notification toEntity(NotificationDTO dto) {
         if (dto == null) return null;
 
         Notification notification = new Notification();
         notification.setNotificationId(dto.getNotificationId());
-        notification.setUser(user);
+        notification.setUserId(dto.getUserId());
+        notification.setArticleId(dto.getArticleId());
         notification.setMessage(dto.getMessage());
         notification.setCreatedAt(dto.getCreatedAt());
         return notification;
     }
 
-    public static List<NotificationDTO> toDTOList(List<Notification> notificationList){
-
-        List<NotificationDTO> notificationDTOList = new ArrayList<>();
-        for(Notification notification : notificationList){
-            NotificationDTO notificationDTO =  toDTO(notification);
-            notificationDTOList.add(notificationDTO);
+    public static List<NotificationDTO> toDTOList(List<Notification> notificationList) {
+        List<NotificationDTO> dtoList = new ArrayList<>();
+        for (Notification notification : notificationList) {
+            dtoList.add(toDTO(notification));
         }
-
-        return notificationDTOList;
+        return dtoList;
     }
 }
+

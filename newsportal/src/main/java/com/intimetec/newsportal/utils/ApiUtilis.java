@@ -45,7 +45,7 @@ public class ApiUtilis {
                             .append(URLEncoder.encode(value, StandardCharsets.UTF_8))
                             .append("&")
             );
-            urlBuilder.deleteCharAt(urlBuilder.length() - 1); // remove last '&'
+            urlBuilder.deleteCharAt(urlBuilder.length() - 1);
         }
         return urlBuilder.toString();
     }

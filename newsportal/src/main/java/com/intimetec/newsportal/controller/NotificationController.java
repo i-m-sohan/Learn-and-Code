@@ -22,6 +22,13 @@ public class NotificationController {
     @Autowired
     NotificationService notificationService;
 
+
+    @GetMapping("/category-preference/{userId}")
+    public ResponseEntity<?> getCategoryNotificationPreference(@PathVariable Long userId){
+        List<CategoryNotificationPreferenceDTO> categoryNotificationPreferenceDTOS = notificationService.getUserCategoryPreferences(userId);
+        return new ResponseEntity<>(Map.of("Category Preference List",categoryNotificationPreferenceDTOS),HttpStatus.OK);
+    }
+
     @PatchMapping("/category-preference/{userId}")
     public ResponseEntity<?> setCategoryNotificationPreference(@PathVariable Long userId, @RequestBody CategoryNotificationPreferenceDTO categoryNotificationPreference){
         notificationService.updateUserCategoryPreference(userId,categoryNotificationPreference);

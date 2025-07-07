@@ -29,6 +29,32 @@ public class ArticleMapper {
         return dto;
     }
 
+    public static ArticleDTO toDTO(Article article,List<Category> categories){
+        if (article == null) return null;
+
+        ArticleDTO dto = new ArticleDTO();
+        dto.setArticleId(article.getArticleId());
+        dto.setTitle(article.getTitle());
+        dto.setDescription(article.getDescription());
+        dto.setContent(article.getContent());
+        dto.setSource(article.getSource());
+        dto.setUrl(article.getUrl());
+        dto.setPublishedDate(article.getPublishedDate());
+        dto.setLikesCount(article.getLikesCount());
+        dto.setDislikesCount(article.getDislikesCount());
+        dto.setReportCount(article.getReportCount());
+        dto.setIsVisible(article.isVisible());
+        List<String> categoryList = new ArrayList<>();
+        if(categories != null){
+            for (Category category : categories) {
+                if (categoryList.contains(category.getCategoryName())) {
+                    categoryList.add(category.getCategoryName());
+                }
+            }
+        }
+        return dto;
+    }
+
     public static Article toEntity(ArticleDTO dto) {
         if (dto == null) return null;
 

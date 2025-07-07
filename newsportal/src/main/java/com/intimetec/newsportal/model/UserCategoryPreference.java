@@ -12,22 +12,21 @@ public class UserCategoryPreference {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long preferenceId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoryId", nullable = false)
-    private Category category;
+    @Column(nullable = false)
+    private Long userId; // Matches bigint
 
     @Column(nullable = false)
-    private Boolean notificationsEnabled = true;
+    private Integer categoryId; // Matches int
 
-    public UserCategoryPreference() {}
+    @Column(nullable = false)
+    private Boolean notificationsEnabled = true; // Matches tinyint(1)
 
-    public UserCategoryPreference(User user, Category category, Boolean notificationsEnabled) {
-        this.user = user;
-        this.category = category;
+    public UserCategoryPreference() {
+    }
+
+    public UserCategoryPreference(Long userId, Integer categoryId, Boolean notificationsEnabled) {
+        this.userId = userId;
+        this.categoryId = categoryId;
         this.notificationsEnabled = notificationsEnabled;
     }
 
@@ -39,20 +38,20 @@ public class UserCategoryPreference {
         this.preferenceId = preferenceId;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public Category getCategory() {
-        return category;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
     public Boolean getNotificationsEnabled() {
@@ -67,9 +66,13 @@ public class UserCategoryPreference {
     public String toString() {
         return "UserCategoryPreference{" +
                 "preferenceId=" + preferenceId +
-                ", user=" + (user != null ? user.getId() : null) +
-                ", category=" + (category != null ? category.getCategoryId() : null) +
+                ", userId=" + userId +
+                ", categoryId=" + categoryId +
                 ", notificationsEnabled=" + notificationsEnabled +
                 '}';
     }
 }
+
+
+
+

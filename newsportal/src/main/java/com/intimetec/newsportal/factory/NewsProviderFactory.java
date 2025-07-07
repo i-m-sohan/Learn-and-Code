@@ -41,35 +41,17 @@ public class NewsProviderFactory {
         return client;
     }
 
-    public NewsClient getBestNewsApiClient(){
-        List<ExternalNewsSourceDTO> externalNewsSourceDTOList =  externalNewsSourceService.findAllByOrderByLastAccessedAsc();
-
-        ExternalNewsSourceDTO validSource = new ExternalNewsSourceDTO();
-
-        for(ExternalNewsSourceDTO externalNewsSourceDTO : externalNewsSourceDTOList){
-            if(externalNewsSourceDTO.getStatus()){
-                validSource = externalNewsSourceDTO;
-            }
-        }
-        validSource.setLastAccessed(LocalDateTime.now());
-        externalNewsSourceService.updateNewsSourceLastAccessed(validSource);
-
-        NewsClient newsClient = getClientBySource(validSource.getSourceName());
-        newsClient.setBaseUrl(validSource.getBaseUrl());
-        newsClient.setApiKey(validSource.getApiKey());
-        return newsClient;
-    }
-
    public List<NewsClient> getAvailableNewsClients(){
         List<ExternalNewsSourceDTO> externalNewsSourceDTOList = externalNewsSourceService.getAllAvailableExternalNewsSources();
         List<NewsClient> newsClientList = new ArrayList<>();
         for(ExternalNewsSourceDTO externalNewsSourceDTO : externalNewsSourceDTOList){
+            externalNewsSourceDTO.setLastAccessed(LocalDateTime.now());
+            externalNewsSourceService.updateNewsSourceLastAccessed(externalNewsSourceDTO);
             NewsClient newsClient = getClientBySource(externalNewsSourceDTO.getSourceName());
             newsClient.setApiKey(externalNewsSourceDTO.getApiKey());
             newsClient.setBaseUrl(externalNewsSourceDTO.getBaseUrl());
             newsClientList.add(newsClient);
         }
-
         return newsClientList;
     }
 }

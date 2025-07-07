@@ -15,8 +15,6 @@ import java.util.List;
 @SpringBootApplication
 public class NewsAggregationPortalApplication {
 
-
-
 	public static void main(String[] args) {
 		var context = SpringApplication.run(NewsAggregationPortalApplication.class, args);
 		ArticleRepository articleRepository = context.getBean(ArticleRepository.class);

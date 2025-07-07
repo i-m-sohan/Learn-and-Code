@@ -14,6 +14,14 @@ import java.util.Map;
 
 public class ApiUtilis {
 
+    public static HttpResponse<String> get(String baseUrl)
+            throws IOException, InterruptedException{
+        Map<String, String> queryParams = new HashMap<>();
+        Map<String, String> header = new HashMap<>();
+
+        return get(baseUrl,queryParams,header);
+    }
+
     public static HttpResponse<String> get(String baseUrl, Map<String, String> queryParams)
             throws IOException, InterruptedException{
         Map<String, String> header = new HashMap<>();
@@ -36,6 +44,13 @@ public class ApiUtilis {
         HttpClient client = HttpClient.newHttpClient();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
+
+    public static HttpResponse<String> post(String url)
+            throws IOException, InterruptedException {
+        HttpResponse<String> response =  post(url,new HashMap<>());
+        return response;
+    }
+
     public static HttpResponse<String> post(String url, Map<String, String> jsonBody)
             throws IOException, InterruptedException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -80,4 +95,50 @@ public class ApiUtilis {
         }
         return urlBuilder.toString();
     }
+
+    public static HttpResponse<String> patch(String url, Object dto)
+            throws IOException, InterruptedException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(dto);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static HttpResponse<String> delete(String url, Object dto)
+            throws IOException, InterruptedException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(dto);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .method("DELETE", HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static HttpResponse<String> post(String url, Object dto)
+            throws IOException, InterruptedException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(dto);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
 }

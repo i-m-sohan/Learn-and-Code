@@ -17,7 +17,8 @@ public interface ArticleRepository extends JpaRepository<Article,Integer> {
             "LOWER(a.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Article> searchByKeyword(@Param("keyword") String keyword);
 
-    List<Article> findByReportCountGreaterThan(int reportCount);
+    @Query("SELECT a FROM Article a WHERE a.reportCount > :count AND a.isVisible = true")
+    List<Article> findVisibleReportedArticles(@Param("count") int count);
 
     @Query("SELECT article FROM Article article JOIN article.categories category " +
             "WHERE category.categoryId = :categoryId AND article.isVisible = true")

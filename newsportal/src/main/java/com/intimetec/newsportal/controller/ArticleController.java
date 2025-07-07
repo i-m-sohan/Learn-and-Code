@@ -1,10 +1,7 @@
 package com.intimetec.newsportal.controller;
 
 import com.intimetec.newsportal.dto.*;
-import com.intimetec.newsportal.service.ArticleFlagService;
-import com.intimetec.newsportal.service.ArticleReactionService;
-import com.intimetec.newsportal.service.ArticleService;
-import com.intimetec.newsportal.service.SavedArticleService;
+import com.intimetec.newsportal.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +26,14 @@ public class ArticleController {
     @Autowired
     ArticleFlagService articleFlagService;
 
-    @PostMapping("/headlines")
-    public ResponseEntity<?> getHeadlines(@RequestBody HeadlineRequestDTO headlineRequestDTO){
+    @Autowired
+    PersonalizationService personalizationService;
+
+    @PostMapping("/headlines/{userId}")
+    public ResponseEntity<?> getHeadlines(@PathVariable Long userId, @RequestBody HeadlineRequestDTO headlineRequestDTO){
         List<ArticleDTO> articleDTOList= articleService.getHeadlineArticles(headlineRequestDTO);
-        return new ResponseEntity<>(articleDTOList, HttpStatus.OK);
+        List<ArticleDTO> articleDTOListPeronsalized = personalizationService.getPersonalizedArticles(userId,articleDTOList);
+        return new ResponseEntity<>(Map.of("headlines",articleDTOListPeronsalized), HttpStatus.OK);
     }
 
     @PostMapping("/save")
@@ -47,10 +48,10 @@ public class ArticleController {
         return new ResponseEntity<>(Map.of("Message","Article deleted Succesfully"),HttpStatus.CREATED);
     }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<?> searchArticle(@RequestBody ArticleSearchRequestDTO articleSearchRequestDTO){
         List<ArticleDTO> articleDTOList =  articleService.searchArticles(articleSearchRequestDTO.getKeyword());
-        return new ResponseEntity<>(Map.of("Articles",articleDTOList),HttpStatus.OK);
+        return new ResponseEntity<>(Map.of("articles",articleDTOList),HttpStatus.OK);
     }
 
     @PostMapping("/react")
@@ -60,8 +61,8 @@ public class ArticleController {
     }
 
     @PostMapping("/report")
-    public ResponseEntity<?> reportArticle(@RequestBody ArticleFlagRequestDTO articleFlagRequestDTO){
-        articleFlagService.flagArticle(articleFlagRequestDTO);
+    public ResponseEntity<?> reportArticle(@RequestBody ArticleReportRequestDTO articleReportRequestDTO){
+        articleFlagService.flagArticle(articleReportRequestDTO);
         return new ResponseEntity<>(Map.of("Message","Article Reported Successfully!"),HttpStatus.OK);
     }
 
@@ -75,7 +76,7 @@ public class ArticleController {
     public ResponseEntity<?> getReportedArticlesSummary(){
         System.out.println("In controller");
         List<ReportedArticleSummaryDTO> reportedArticleSummaryDTOList = articleFlagService.getReportedArticleSummary();
-        return new ResponseEntity<>(Map.of("Reported Articles's Summary",reportedArticleSummaryDTOList),HttpStatus.OK);
+        return ResponseEntity.ok(reportedArticleSummaryDTOList);
     }
 
     @PostMapping("/admin/hide/{articleId}")

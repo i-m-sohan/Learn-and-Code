@@ -2,6 +2,7 @@ package com.intimetec.newsportal.service.serviceImpl;
 
 import com.intimetec.newsportal.dto.ArticleDTO;
 import com.intimetec.newsportal.dto.SaveOrRemoveArticleDTO;
+import com.intimetec.newsportal.exception.EntityNotFoundException;
 import com.intimetec.newsportal.mapper.ArticleMapper;
 import com.intimetec.newsportal.model.Article;
 import com.intimetec.newsportal.model.User;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SavedArticleServiceImpl implements SavedArticleService {
@@ -32,10 +34,18 @@ public class SavedArticleServiceImpl implements SavedArticleService {
     public void saveUserArticle(SaveOrRemoveArticleDTO saveUserArticleRequestDTO){
         Long userId = saveUserArticleRequestDTO.getUserId();
         Integer articleId = saveUserArticleRequestDTO.getArticleId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException("Article not found"));
+
+        Optional<User> userOptional = userRepository.findById(userId);
+        if(userOptional.isEmpty()){
+            throw new EntityNotFoundException("User not found!");
+        }
+        User user = userOptional.get();
+
+        Optional<Article> articleOptional = articleRepository.findById(articleId);
+        if(articleOptional.isEmpty()){
+            throw new EntityNotFoundException("User not found!");
+        }
+        Article article = articleOptional.get();
 
         if (!userSavedArticleRepository.existsByUserAndArticle(user,article)) {
             UserSavedArticle savedArticle = new UserSavedArticle(user, article);
@@ -47,10 +57,16 @@ public class SavedArticleServiceImpl implements SavedArticleService {
     public void deleteSavedArticle(SaveOrRemoveArticleDTO saveUserArticleRequestDTO){
         Long userId = saveUserArticleRequestDTO.getUserId();
         Integer articleId = saveUserArticleRequestDTO.getArticleId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new RuntimeException("Article not found"));
+        Optional<User> userOptional = userRepository.findById(userId);
+        if(userOptional.isEmpty()){
+            throw new EntityNotFoundException("User not found!");
+        }
+        User user = userOptional.get();
+        Optional<Article> articleOptional = articleRepository.findById(articleId);
+        if(articleOptional.isEmpty()){
+            throw new EntityNotFoundException("User not found!");
+        }
+        Article article = articleOptional.get();
 
         if (userSavedArticleRepository.existsByUserAndArticle(user,article)) {
             UserSavedArticle savedArticle = new UserSavedArticle(user, article);

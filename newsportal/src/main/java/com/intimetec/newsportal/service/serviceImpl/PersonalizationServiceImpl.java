@@ -59,23 +59,9 @@ public class PersonalizationServiceImpl implements PersonalizationService {
         Map<Integer,Long> articleToRelevanceScoreMap = new HashMap<>();
 
         Map<Integer,Long> articleIdToLikeRelevanceMap = computeLikeContribution(userId,articleDTOList);
-//
-//        for(Integer articleId : articleIdToLikeRelevanceMap.keySet()){
-//            System.out.println("Articel Id : " + articleId);
-//            System.out.println("Like Relevance :" + articleIdToLikeRelevanceMap.get(articleId));
-//        }
-//
         Map<Integer,Long> articleIdToDisikeRelevanceMap = computeDislikeContribution(userId,articleDTOList);
-//        for(Integer articleId : articleIdToDisikeRelevanceMap.keySet()){
-//            System.out.println("Articel Id : " + articleId);
-//            System.out.println("Dislike Relevance :" + articleIdToDisikeRelevanceMap.get(articleId));
-//        }
 
         Map<Integer,Long> articleIdToReportRelevanceMap = computeReportContribution(userId,articleDTOList);
-//        for(Integer articleId : articleIdToReportRelevanceMap.keySet()){
-//            System.out.println("Articel Id : " + articleId);
-//            System.out.println("Report Relevance :" + articleIdToReportRelevanceMap.get(articleId));
-//        }
 
         for(ArticleDTO articleDTO : articleDTOList){
             Integer articleId = articleDTO.getArticleId();
